@@ -1,0 +1,21 @@
+{
+  "name": "Athletics — suivi de transformation",
+  "short_name": "Athletics",
+  "description": "Suivi personnel de transformation physique : check-in quotidien, séances, corps, bilan hebdomadaire.",
+  "lang": "fr",
+  "dir": "ltr",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d1014",
+  "theme_color": "#0d1014",
+  "categories": ["health", "fitness"],
+  "icons": [
+    { "src": "icons/icon-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

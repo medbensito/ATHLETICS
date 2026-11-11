@@ -22,11 +22,13 @@ import {
 import { demarrerSeance, NOMS_JOURS_LONGS } from '../seance-du-jour.js';
 import * as enCours from './seance-en-cours.js';
 import * as exercice from './exercice.js';
+import * as records from './records.js';
 
 export function monter(racine, params, entete) {
   if (params[0] === 'en-cours') return enCours.monter(racine, params, entete);
   if (params[0] === 'exercice') return exercice.monter(racine, params.slice(1), entete);
   if (params[0] === 'modifier') return editeur(racine, params[1], entete);
+  if (params[0] === 'records') return records.monter(racine, params.slice(1), entete);
   return liste(racine, entete);
 }
 
@@ -92,6 +94,10 @@ async function liste(racine, entete) {
         </section>` : ''}
       ${programme.map(carteSeance).join('')}
       <button type="button" class="bouton bouton--secondaire" data-action="ajouter">+ Ajouter une séance</button>
+      <a class="carte carte--lien carte--rangee" href="#/seances/records">
+        <span class="carte__titre">Records et force estimée</span>
+        <span class="carte__fleche" aria-hidden="true">›</span>
+      </a>
       ${terminees.length ? `
         <section class="carte">
           <h2 class="carte__titre">Dernières séances</h2>

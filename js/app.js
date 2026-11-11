@@ -37,7 +37,9 @@ const ROUTE_PAR_DEFAUT = 'aujourdhui';
 
 /** Découpe l'adresse : « #/aujourdhui/2026-11-10 » → { nom: 'aujourdhui', params: ['2026-11-10'] } */
 function routeCourante() {
-  const [nom, ...params] = location.hash.replace(/^#\/?/, '').split('/');
+  const [nom, ...brut] = location.hash.replace(/^#\/?/, '').split('/');
+  // Les morceaux d'adresse arrivent encodés (« %C3%A9 » pour « é ») : on les décode.
+  const params = brut.map((morceau) => { try { return decodeURIComponent(morceau); } catch { return morceau; } });
   return routes[nom] ? { nom, params } : { nom: ROUTE_PAR_DEFAUT, params: [] };
 }
 

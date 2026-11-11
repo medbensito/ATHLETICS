@@ -6,6 +6,7 @@
 import { cleJour, estCleJour, decalerJour, dateCourte, formatDuree } from '../dates.js';
 import { echapper } from '../ui.js';
 import { lundi, calculerBilan, messageSemaine, formatNombre } from '../bilan.js';
+import * as calendrier from './calendrier.js';
 
 /** Écart avec la semaine précédente, en texte neutre (sans couleur ni jugement). */
 function ecart(actuel, precedent, format) {
@@ -27,6 +28,7 @@ const barre = (part, libelle) => `
   </div>`;
 
 export async function monter(racine, params, entete) {
+  if (params[0] === 'mois') return calendrier.monter(racine, params.slice(1), entete);
   const actuelle = lundi(cleJour());
   const demande = estCleJour(params[0]) ? lundi(params[0]) : actuelle;
   const cle = demande > actuelle ? actuelle : demande;
@@ -53,6 +55,11 @@ export async function monter(racine, params, entete) {
         ? '<span class="jours__fleche jours__fleche--inactive" aria-hidden="true">›</span>'
         : `<a class="jours__fleche" href="#/bilan/${decalerJour(cle, 7)}" aria-label="Semaine suivante">›</a>`}
     </div>
+
+    <a class="carte carte--lien carte--rangee" href="#/bilan/mois/${cle.slice(0, 7)}">
+      <span class="carte__titre">Calendrier du mois</span>
+      <span class="carte__fleche" aria-hidden="true">›</span>
+    </a>
 
     <section class="carte carte--accent message-semaine">
       <p class="message-semaine__texte">${echapper(messageSemaine(s, p))}</p>

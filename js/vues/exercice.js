@@ -7,6 +7,7 @@ import { lireTout } from '../db.js';
 import { dateCourte } from '../dates.js';
 import { echapper } from '../ui.js';
 import { historiqueExercice, formatCharge, formatSerie } from '../programme.js';
+import { recordsExercice } from '../records.js';
 
 export async function monter(racine, params, entete) {
   const id = params[0];
@@ -63,8 +64,9 @@ export async function monter(racine, params, entete) {
       <div class="chiffres">
         ${chiffre(derniere !== null ? `${formatCharge(derniere)} kg` : '—', 'Dernière charge')}
         ${chiffre(record !== null ? `${formatCharge(record)} kg` : '—', 'Meilleure charge')}
-        ${chiffre(String(passages.length), passages.length > 1 ? 'Séances' : 'Séance')}
+        ${chiffre(recordsExercice(journal, nom)?.max ? `${formatCharge(Math.round(recordsExercice(journal, nom).max.valeur * 2) / 2)} kg` : '—', 'Max estimé')}
       </div>
+      <p class="carte__note">${passages.length} séance${passages.length > 1 ? 's' : ''}. Max estimé : charge théorique sur une répétition, calculée d'après tes séries (pas un test à faire).</p>
       ${avecCharge.length > 1 ? `<p class="carte__note">Depuis la première séance : ${
         derniere - premiere === 0 ? 'charge stable' : `${derniere > premiere ? '+' : '−'} ${formatCharge(Math.abs(derniere - premiere))} kg`}.</p>` : ''}
     </section>

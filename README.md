@@ -3,7 +3,7 @@
 Application web progressive (PWA) personnelle de suivi de transformation physique.
 Tout reste sur l'appareil : pas de serveur, pas de compte, pas de service tiers.
 
-**Version 1.3.0** — check-in quotidien et séance du jour, programme sur-mesure de 6 mois (Push / Pull / Legs / Upper / Lower) et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire, rappels, sauvegarde et restauration JSON.
+**Version 1.4.0** — check-in quotidien et séance du jour, programme sur-mesure de 6 mois (Push / Pull / Legs / Upper / Lower) et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire et calendrier, records, rappels, sauvegarde et restauration JSON.
 
 App en ligne : <https://medbensito.github.io/ATHLETICS/> (dépôt `medbensito/ATHLETICS`, GitHub Pages sur la branche `main`).
 
@@ -28,6 +28,7 @@ ATHLETICS/
 │   ├── plan.js           Programme sur-mesure 6 mois : contenu et phases
 │   ├── seance-du-jour.js Séance prévue aujourd'hui, démarrage d'une séance
 │   ├── alternatives.js   Exercices de remplacement, par groupes de mouvements
+│   ├── records.js        Records, max estimé, nouveaux records d'une séance
 │   ├── plateforme.js     Détection iOS / app installée, état technique
 │   ├── ui.js             Morceaux d'interface partagés
 │   ├── version.js        Numéro de version affiché dans les réglages
@@ -38,6 +39,8 @@ ATHLETICS/
 │       ├── exercice.js   Historique d'un exercice
 │       ├── corps.js      Écran « Corps » : mesures, graphiques, période
 │       ├── bilan.js      Écran « Bilan » : le point de la semaine
+│       ├── calendrier.js Calendrier de régularité, mois par mois
+│       ├── records.js    Écran « Records »
 │       └── reglages.js   Écran « Réglages » : rappels, sauvegarde, état de l'app
 ├── icons/                Icônes 180 (iOS), 192, 512 et 512 « maskable »
 ├── README.md             Ce fichier
@@ -92,7 +95,9 @@ ATHLETICS/
 - **Terminer la séance** l'enregistre et coche « Séance : faite » dans le check-in du jour.
 - Si l'app est fermée en pleine séance, elle reprend où elle en était (carte « Séance en cours »).
 
-**Historique** : lien « Historique » dans le mode séance ou dans l'éditeur — dernière charge, meilleure charge et détail séance par séance avec l'écart d'une fois sur l'autre.
+**Historique** : lien « Historique » dans le mode séance ou dans l'éditeur — dernière charge, meilleure charge, max estimé et détail séance par séance avec l'écart d'une fois sur l'autre.
+
+**Records** (onglet Séances, en bas) : meilleure charge et max estimé de chaque exercice. Le max estimé est la charge théorique sur une répétition, calculée d'après tes séries (formule d'Epley, jusqu'à 12 répétitions) : une estimation, pas un test à faire. En fin de séance, les nouveaux records sont annoncés.
 
 ## Utiliser le suivi corporel
 
@@ -112,6 +117,7 @@ ATHLETICS/
 - Les moyennes ne portent que sur les jours renseignés : un jour vide ne compte jamais comme un zéro.
 - Le message de la semaine ne reprend que des faits encourageants ; les chiffres, eux, restent complets.
 - Le nombre de repas par jour (3 par défaut) se règle dans Réglages.
+- **Calendrier du mois** (lien en haut du bilan) : chaque jour du mois, avec les séances faites, les check-ins remplis, les jours de repos et les séances prévues. Pas de compteur de jours d'affilée : un oubli n'efface rien.
 
 ## Rappels
 
@@ -194,3 +200,4 @@ Les mises à jour ne touchent jamais les données saisies.
 - [x] **1.1** — programme sur-mesure 6 mois, progression des charges, semaines allégées
 - [x] **1.2** — répartition Push / Pull / Legs / Upper / Lower (mar, mer, jeu, sam, dim)
 - [x] **1.3** — séance du jour à l'accueil, remplacement d'exercice en séance
+- [x] **1.4** — calendrier de régularité, records et max estimé

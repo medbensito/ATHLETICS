@@ -597,6 +597,28 @@ input[type="date"].saisie::-webkit-date-and-time-value { text-align: center; }
 .pilule--choix { min-height: 40px; text-align: left; }
 .pilule--choix[aria-pressed="true"] { background: var(--accent); color: var(--accent-encre); box-shadow: none; }
 
+/* ---------- Calendrier et records (1.4) ---------- */
+.carte--rangee { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; }
+.carte__fleche { color: var(--texte-doux); font-size: 24px; line-height: 1; }
+
+.cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.cal__entete { color: var(--texte-doux); font-size: 12px; font-weight: 600; text-align: center; }
+.cal__jour {
+  display: grid; place-items: center; aspect-ratio: 1; border-radius: 10px;
+  background: var(--surface-2); color: var(--texte-doux); font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums;
+}
+.cal__jour--vide { background: none; }
+.cal__jour--futur { background: none; box-shadow: inset 0 0 0 1px var(--trait); }
+.cal__jour--seance { background: var(--accent); color: var(--accent-encre); }
+.cal__jour--note { background: var(--surface-2); color: var(--texte); box-shadow: inset 0 -3px 0 var(--accent); }
+.cal__jour--repos { background: var(--surface-2); color: var(--texte); box-shadow: inset 0 0 0 2px var(--texte-doux); }
+.cal__jour--prevu { box-shadow: inset 0 0 0 2px var(--accent); color: var(--texte); }
+.cal__jour--aujourdhui { outline: 2px solid var(--texte); outline-offset: 2px; }
+.cal__cle { display: inline-block; width: 14px; height: 14px; aspect-ratio: auto; border-radius: 4px; }
+
+.record__max { display: grid; justify-items: end; font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.record__max small { color: var(--texte-doux); font-size: 11px; font-weight: 600; }
+
 /* ---------- Confort ---------- */
 @media (prefers-reduced-motion: no-preference) {
   .vue { animation: entree 0.22s ease-out both; }

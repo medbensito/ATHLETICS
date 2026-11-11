@@ -17,6 +17,7 @@ import {
 } from '../programme.js';
 import { checkinVide } from './checkin.js';
 import { alternatives } from '../alternatives.js';
+import { nouveauxRecords } from '../records.js';
 
 // ---------- Signal de fin de repos ----------
 
@@ -397,7 +398,11 @@ export async function monter(racine, params, entete) {
           checkin.majLe = new Date().toISOString();
           await ecrire('checkins', checkin);
         }
-        laisserMessage(`Séance enregistrée : ${nbSeries} série${nbSeries > 1 ? 's' : ''} en ${dureeMinutes(seance)} min.`);
+        const records = nouveauxRecords(seance, await lireTout('journal'));
+        const texteRecords = records.length
+          ? ` Nouveau record${records.length > 1 ? 's' : ''} : ${records.slice(0, 3).map((r) => `${r.nom} ${formatCharge(r.charge)} kg × ${r.reps}`).join(', ')}.`
+          : '';
+        laisserMessage(`Séance enregistrée : ${nbSeries} série${nbSeries > 1 ? 's' : ''} en ${dureeMinutes(seance)} min.${texteRecords}`);
         location.hash = '#/seances';
         return;
       }

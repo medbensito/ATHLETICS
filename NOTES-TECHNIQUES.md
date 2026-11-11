@@ -193,6 +193,23 @@ Document tenu à jour à chaque jalon : choix faits, et points à vérifier sur 
 - [ ] En séance, « Remplacer » affiche les alternatives ; la saisie libre ouvre le clavier sans zoom.
 - [ ] Le sélecteur « Jour » de l'éditeur ouvre la roue iOS.
 
+## Choix techniques (1.4 — calendrier et records)
+
+| Sujet | Choix | Raison |
+|---|---|---|
+| Calendrier | Vue mensuelle depuis le bilan (`#/bilan/mois/AAAA-MM`) ; une case par jour : séance faite, check-in rempli, repos, séance prévue | Voir la régularité d'un coup d'œil. Navigation limitée aux mois qui ont des données, jusqu'au mois en cours. |
+| Pas de « série » | Aucun compteur de jours consécutifs | Un compteur remis à zéro au premier oubli est démotivant ; le calendrier montre ce qui a été fait, pas ce qui a été manqué. |
+| Codage des cases | Plein = séance, trait bas = check-in, contour gris = repos, contour vert = prévu ; chaque case a un libellé lisible par VoiceOver | L'information ne repose pas sur la seule couleur. |
+| Max estimé | Formule d'Epley, `charge × (1 + reps / 30)`, jusqu'à 12 répétitions, arrondi à 0,5 kg à l'affichage | Formule simple et répandue ; au-delà de 12 répétitions l'estimation devient peu fiable. Présentée comme une estimation, jamais comme un test à réaliser. |
+| Records | Regroupés par nom d'exercice, séances terminées, exercices en répétitions avec charge | Cohérent avec l'historique et le remplacement d'exercice. |
+| Annonce | En fin de séance : record de charge, ou à défaut de max estimé ; un exercice fait pour la première fois ne compte pas | Pas de faux records à la première séance. |
+| Routeur | Les morceaux d'adresse sont décodés (`decodeURIComponent`) | Un identifiant avec accents ou espaces ouvre bien la bonne page. |
+
+## Points à vérifier sur iPhone (1.4)
+
+- [ ] Le calendrier tient sur l'écran sans défilement horizontal ; les cases se touchent facilement.
+- [ ] L'annonce de fin de séance affiche un nouveau record après une séance plus lourde.
+
 ## Récapitulatif : ce qui ne peut être vérifié que sur un vrai iPhone
 
 - Installation, plein écran, encoche et barre d'accueil (J1).

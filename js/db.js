@@ -87,6 +87,26 @@ export const ecrire = (magasin, valeur) => transaction(magasin, 'readwrite', (s)
 /** Supprime un enregistrement par sa clé. */
 export const supprimer = (magasin, cle) => transaction(magasin, 'readwrite', (s) => s.delete(cle));
 
+/**
+ * Remplace TOUTES les données par celles fournies, en une seule transaction :
+ * si une écriture échoue, rien n'est modifié.
+ * donnees : { checkins: [...], reglages: [...], ... } — un magasin absent est vidé.
+ */
+export async function remplacerTout(donnees) {
+  const db = await ouvrir();
+  return new Promise((resoudre, rejeter) => {
+    const tx = db.transaction(MAGASINS, 'readwrite');
+    for (const magasin of MAGASINS) {
+      const store = tx.objectStore(magasin);
+      store.clear();
+      for (const valeur of donnees[magasin] || []) store.put(valeur);
+    }
+    tx.oncomplete = () => resoudre();
+    tx.onerror = () => rejeter(tx.error);
+    tx.onabort = () => rejeter(tx.error || new Error('Import interrompu, aucune donnée modifiée.'));
+  });
+}
+
 /** Compte les enregistrements d'un magasin. */
 export const compter = (magasin) => transaction(magasin, 'readonly', (s) => s.count());
 

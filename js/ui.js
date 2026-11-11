@@ -9,17 +9,6 @@ import { estInstallee, estIOS } from './plateforme.js';
 export const echapper = (texte) =>
   String(texte ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-/** Bloc vide pour les écrans pas encore construits. */
-export function ecranVide(titre, texte, jalon) {
-  return `
-    <section class="vide">
-      <div class="vide__marque" aria-hidden="true"></div>
-      <h2 class="vide__titre">${echapper(titre)}</h2>
-      <p class="vide__texte">${echapper(texte)}</p>
-      <p class="etiquette">Prévu au jalon ${echapper(jalon)}</p>
-    </section>`;
-}
-
 /** Ligne d'état : pastille + libellé + valeur. */
 export function ligneEtat(libelle, ok, valeur) {
   const classe = ok === true ? 'pastille--ok' : ok === false ? 'pastille--attente' : 'pastille--inconnu';

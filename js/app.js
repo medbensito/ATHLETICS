@@ -10,33 +10,24 @@
  * et « entete({ titre, surTitre }) » met à jour le haut de l'écran.
  * monter() peut renvoyer une fonction de nettoyage, appelée quand on quitte l'écran
  * (arrêt d'un chronomètre, enregistrement d'une saisie en attente…).
- * Les écrans des jalons à venir sont de simples coquilles vides.
  */
 
 import { etat, estInstallee } from './plateforme.js';
-import { ecranVide, echapper } from './ui.js';
+import { echapper } from './ui.js';
 import { cleJour } from './dates.js';
 import * as checkin from './vues/checkin.js';
 import * as reglages from './vues/reglages.js';
 import * as seances from './vues/seances.js';
 import * as corps from './vues/corps.js';
+import * as bilan from './vues/bilan.js';
 
 const $ = (sel) => document.querySelector(sel);
-
-/** Fabrique un écran provisoire pour un jalon à venir. */
-const provisoire = (titre, surTitre, accroche, texte, jalon) => ({
-  monter(racine, params, entete) {
-    entete({ titre, surTitre });
-    racine.innerHTML = ecranVide(accroche, texte, jalon);
-  },
-});
 
 const routes = {
   aujourdhui: checkin,
   seances,
   corps,
-  bilan: provisoire('Bilan', 'Semaine', 'Le point de la semaine',
-    'Régularité, sommeil, cigarettes et repas équilibrés, résumés simplement.', 'J5'),
+  bilan,
   reglages,
 };
 

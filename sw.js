@@ -14,7 +14,7 @@
  * et ne sont jamais touchées par ce fichier.
  */
 
-const VERSION = 'v0.4.0';
+const VERSION = 'v1.0.0';
 const CACHE = `athletics-${VERSION}`;
 
 // Chemins relatifs : l'app fonctionne aussi dans un sous-dossier (ex. GitHub Pages).
@@ -33,12 +33,15 @@ const FICHIERS = [
   './js/programme.js',
   './js/corps.js',
   './js/graphique.js',
+  './js/bilan.js',
+  './js/rappels.js',
   './js/vues/checkin.js',
   './js/vues/reglages.js',
   './js/vues/seances.js',
   './js/vues/seance-en-cours.js',
   './js/vues/exercice.js',
   './js/vues/corps.js',
+  './js/vues/bilan.js',
   './icons/icon-180.png',
   './icons/icon-192.png',
   './icons/icon-512.png',

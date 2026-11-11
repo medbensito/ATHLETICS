@@ -1,6 +1,5 @@
 /*
- * Sauvegarde : export de toutes les données dans un fichier JSON.
- * (L'import arrivera au jalon J5 et relira exactement ce format.)
+ * Sauvegarde : export de toutes les données dans un fichier JSON, et import de ce fichier.
  *
  * Format du fichier :
  * {
@@ -12,7 +11,7 @@
  * }
  */
 
-import { MAGASINS, lireTout, lireReglage, ecrireReglage } from './db.js';
+import { MAGASINS, lireTout, lireReglage, ecrireReglage, remplacerTout } from './db.js';
 import { cleJour, joursEntre } from './dates.js';
 import { VERSION_APP } from './version.js';
 
@@ -71,6 +70,56 @@ export async function remettreExport({ nom, fichier }) {
 
   await ecrireReglage('dernierExport', new Date().toISOString());
   return resultat;
+}
+
+// ---------- Import ----------
+
+/** Clé principale de chaque magasin : chaque enregistrement importé doit l'avoir. */
+const CLES = { checkins: 'date', reglages: 'cle', seances: 'id', journal: 'id', mesures: 'date' };
+
+/**
+ * Lit et vérifie un fichier de sauvegarde, sans rien modifier.
+ * Renvoie { contenu, resume } ou lève une erreur au message compréhensible.
+ */
+export async function lireSauvegarde(fichier) {
+  let contenu;
+  try {
+    contenu = JSON.parse(await fichier.text());
+  } catch {
+    throw new Error('Ce fichier n\'est pas un fichier JSON lisible.');
+  }
+  if (!contenu || contenu.application !== 'athletics' || typeof contenu.donnees !== 'object' || contenu.donnees === null) {
+    throw new Error('Ce fichier n\'est pas une sauvegarde Athletics.');
+  }
+  if (typeof contenu.format !== 'number' || contenu.format > FORMAT_EXPORT) {
+    throw new Error('Cette sauvegarde vient d\'une version plus récente de l\'app. Mets l\'app à jour avant de l\'importer.');
+  }
+  for (const magasin of MAGASINS) {
+    const liste = contenu.donnees[magasin];
+    if (liste === undefined) continue; // sauvegarde d'une version plus ancienne : magasin vide
+    if (!Array.isArray(liste) || liste.some((e) => !e || typeof e !== 'object' || e[CLES[magasin]] === undefined)) {
+      throw new Error(`La partie « ${magasin} » du fichier est abîmée. Rien n'a été importé.`);
+    }
+  }
+  const n = (m) => (contenu.donnees[m] || []).length;
+  return {
+    contenu,
+    resume: {
+      exporteLe: contenu.exporteLe || null,
+      versionApp: contenu.versionApp || '?',
+      checkins: n('checkins'),
+      seances: n('seances'),
+      journal: n('journal'),
+      mesures: n('mesures'),
+    },
+  };
+}
+
+/** Remplace toutes les données de l'app par celles de la sauvegarde. */
+export async function importerSauvegarde(contenu) {
+  const donnees = {};
+  for (const magasin of MAGASINS) donnees[magasin] = contenu.donnees[magasin] || [];
+  await remplacerTout(donnees);
 }
 
 /** Nombre de jours depuis le dernier export (null si jamais exporté). */

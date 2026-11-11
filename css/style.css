@@ -98,41 +98,6 @@ main:focus { outline: none; }
   margin: 0 auto;
 }
 
-/* ---------- Écran vide ---------- */
-.vide {
-  display: grid;
-  justify-items: start;
-  gap: 10px;
-  padding: 28px 22px;
-  border: 1px dashed var(--trait);
-  border-radius: var(--rayon);
-}
-
-/* Trois barres montantes : rappel discret de l'icône de l'app */
-.vide__marque {
-  width: 44px;
-  height: 36px;
-  margin-bottom: 6px;
-  background:
-    linear-gradient(var(--accent), var(--accent)) left bottom / 10px 40% no-repeat,
-    linear-gradient(var(--accent), var(--accent)) center bottom / 10px 70% no-repeat,
-    linear-gradient(var(--accent), var(--accent)) right bottom / 10px 100% no-repeat;
-  border-radius: 2px;
-}
-
-.vide__titre { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
-.vide__texte { color: var(--texte-doux); }
-
-.etiquette {
-  margin-top: 6px;
-  padding: 5px 11px;
-  border-radius: 999px;
-  background: var(--surface-2);
-  color: var(--texte-doux);
-  font-size: 13px;
-  font-weight: 600;
-}
-
 /* ---------- Cartes ---------- */
 .carte {
   display: grid;
@@ -587,6 +552,29 @@ input[type="date"].saisie::-webkit-date-and-time-value { text-align: center; }
 .depliable__titre::-webkit-details-marker { display: none; }
 .depliable__titre::after { content: "›"; color: var(--texte-doux); font-size: 24px; transition: transform 0.2s; }
 .depliable[open] .depliable__titre::after { transform: rotate(90deg); }
+
+/* ---------- Bilan (J5) ---------- */
+.message-semaine { padding: 18px 20px; }
+.message-semaine__texte { font-size: 18px; font-weight: 600; line-height: 1.4; }
+
+.regularite { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.regularite .chiffre__valeur { font-size: 34px; line-height: 1.1; }
+.chiffre__sur { color: var(--texte-doux); font-size: 20px; font-weight: 600; }
+
+.barre { height: 8px; margin-top: 10px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.barre__remplie { display: block; height: 100%; border-radius: 999px; background: var(--accent); }
+
+.bilan__valeur { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ---------- Réglages et rappels (J5) ---------- */
+.choix--jours { gap: 5px; }
+.choix--jours .choix__option { padding: 0; font-size: 14px; }
+
+.bouton--fichier { display: grid; place-items: center; cursor: pointer; }
+
+.apercu { display: grid; gap: 10px; margin-top: 4px; padding-top: 14px; border-top: 1px solid var(--trait); }
+
+.carte--rappel { gap: 4px; box-shadow: inset 0 0 0 1px var(--accent); text-decoration: none; }
 
 /* ---------- Confort ---------- */
 @media (prefers-reduced-motion: no-preference) {

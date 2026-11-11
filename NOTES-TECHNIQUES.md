@@ -107,14 +107,40 @@ Document tenu à jour à chaque jalon : choix faits, et points à vérifier sur 
 - [ ] Les libellés du graphique (mois, valeurs, date cible) sont lisibles sans zoom.
 - [ ] Le bloc « Période et objectifs » s'ouvre et se ferme.
 
-## Limite connue à anticiper : les rappels (J5)
+## Choix techniques (J5)
 
-Sur iOS, une PWA installée peut recevoir des notifications, mais uniquement des notifications **push envoyées par un serveur**. Une app sans backend ne peut pas programmer une notification qui se déclenche quand elle est fermée.
+| Sujet | Choix | Raison |
+|---|---|---|
+| Semaine | Lundi → dimanche ; la semaine en cours ne compte que les jours écoulés | Un mercredi, 2 check-ins sur 3 jours est juste ; sur 7 jours ce serait décourageant. |
+| Séances prévues | Nombre de séances du programme (5 par défaut) | Aucun jour fixe imposé (voir J3). |
+| Séance comptée | Journal terminé **ou** check-in « faite », un jour = au plus une séance | Une séance faite hors de l'app compte aussi. |
+| Jours vides | Exclus des moyennes, jamais comptés comme zéro | Oublier un check-in ne fausse pas le bilan. |
+| Repas équilibrés | Part = repas équilibrés / (repas par jour × jours notés) ; repas par jour réglable, 3 par défaut | Le check-in note le nombre de repas équilibrés, pas le total : il fallait une référence, laissée à l'utilisateur. |
+| Message | Construit uniquement à partir de faits favorables (séances, cigarettes en baisse, sommeil en hausse, repas, régularité) ; sinon un message neutre | Ton encourageant sans culpabilisation ; les chiffres défavorables restent visibles, sans commentaire. |
+| Rappels dans l'app | Carte à l'accueil après l'heure du check-in ; carte de séance les jours choisis, une heure avant l'heure | Seul rappel possible sans serveur quand l'app est ouverte. |
+| Rappels hors de l'app | Fichier `.ics` : deux événements récurrents avec alarme, UID fixes | Sonne app fermée, sans serveur ni service tiers. Heure « flottante » : suit le fuseau de l'iPhone. |
+| Notifications Web | Non utilisées | Sur iOS, une PWA ne reçoit que des notifications push envoyées par un serveur, exclu par le cahier des charges. |
+| Import | Lecture et vérification complètes avant toute modification, aperçu, confirmation, puis remplacement en **une seule transaction** | Un fichier abîmé ne peut pas laisser la base à moitié remplacée. |
+| Compatibilité | Format de sauvegarde versionné (`format: 1`) ; un magasin absent (sauvegarde ancienne) est vidé, un format plus récent est refusé | Les sauvegardes des jalons précédents restent importables. |
+| Finitions | Écrans provisoires supprimés, version 1.0.0 | — |
 
-Conséquence pour J5, à trancher le moment venu :
+## Points à vérifier sur iPhone (J5)
 
-1. **Rappel visible dans l'app** (prévu par le cahier des charges comme solution de repli) : fiable, mais visible seulement à l'ouverture.
-2. **Fichier calendrier (.ics)** généré par l'app, avec des alarmes récurrentes pour la séance et le check-in du soir : s'importe dans Calendrier d'iOS, sonne même app fermée, sans serveur ni service tiers.
-3. **Notification locale** tant que l'app est ouverte ou en arrière-plan récent : possible, mais peu utile en pratique.
+- [ ] La mise à jour arrive (Réglages affiche 1.0.0) ; toutes les données sont là.
+- [ ] Bilan : les chiffres correspondent aux check-ins de la semaine ; les flèches changent de semaine.
+- [ ] Après 21 h (ou l'heure choisie), l'accueil affiche le rappel du check-in, qui disparaît une fois le check-in complet.
+- [ ] **Fichier calendrier** : « Ajouter les rappels au calendrier » ouvre soit la feuille de partage, soit un aperçu Calendrier avec « Ajouter tout ». Si rien ne se passe dans l'app installée, essayer depuis Safari (même adresse) : les événements ajoutés au calendrier ne dépendent pas de l'app. Vérifier ensuite que l'alarme sonne à l'heure prévue.
+- [ ] **Import** : « Importer une sauvegarde » ouvre le sélecteur de Fichiers ; l'aperçu s'affiche ; après confirmation, les données sont restaurées.
+- [ ] Test complet conseillé : exporter, supprimer l'icône de l'écran d'accueil, réinstaller, importer, vérifier que tout est revenu.
 
-Recommandation actuelle : 1 + 2.
+## Récapitulatif : ce qui ne peut être vérifié que sur un vrai iPhone
+
+- Installation, plein écran, encoche et barre d'accueil (J1).
+- Roulettes iOS des heures et du calendrier, pavés numériques avec virgule, absence de zoom à la saisie (J2 à J4).
+- Feuille de partage pour l'export et le fichier calendrier (J2, J5).
+- Son de fin de repos (coupé en mode silencieux) et écran maintenu allumé pendant une séance (J3).
+- Conservation des données après plusieurs jours sans ouvrir l'app (l'app installée y est protégée).
+
+## Note sur les rappels
+
+Les notifications d'une PWA sur iOS nécessitent un serveur push. Le choix retenu au J5 : rappels visibles dans l'app et fichier calendrier `.ics` (voir le tableau J5).

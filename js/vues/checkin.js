@@ -28,6 +28,7 @@ import { cleJour, estCleJour, decalerJour, dateLongue, nomJour, dureeSommeil, fo
 import { echapper, carteInstallation } from '../ui.js';
 import { joursDepuisExport, formatAnciennete } from '../sauvegarde.js';
 import { carteRappelMesure } from './corps.js';
+import { lireRappels, rappelCheckinActif, rappelSeanceActif } from '../rappels.js';
 
 const LIMITES = { repas: 10, cigarettes: 99 };
 
@@ -163,6 +164,29 @@ export async function monter(racine, params, entete) {
     + (estAujourdhui ? await carteRappelMesure() + await carteSauvegarde(tous.length) + carteInstallation() : '');
 
   const $ = (sel) => racine.querySelector(sel);
+
+  // Rappels du jour (séance, check-in du soir), seulement pour aujourd'hui.
+  if (estAujourdhui) {
+    const rappels = await lireRappels();
+    const enCours = (await lireTout('journal')).some((j) => !j.fin);
+    let cartes = '';
+    if (rappelSeanceActif(rappels) && !enCours) {
+      cartes += `
+        <a class="carte carte--lien carte--rappel" href="#/seances" data-rappel="seance">
+          <span class="carte__titre">Séance prévue aujourd'hui</span>
+          <span class="carte__texte">Ouvre Séances quand tu es prêt. Repos ou imprévu : coche simplement « Repos ».</span>
+        </a>`;
+    }
+    if (rappelCheckinActif(rappels)) {
+      cartes += `
+        <div class="carte carte--rappel" data-rappel="checkin">
+          <span class="carte__titre">C'est l'heure du check-in du soir</span>
+          <span class="carte__texte">Quelques touches suffisent, rien n'est obligatoire.</span>
+        </div>`;
+    }
+    if (cartes) $('.jours').insertAdjacentHTML('afterend', cartes);
+  }
+
   const champCoucher = $('[data-heure="coucher"]');
   const champLever = $('[data-heure="lever"]');
   const champNotes = $('[data-role="notes"]');
@@ -196,6 +220,11 @@ export async function monter(racine, params, entete) {
       $(`[data-rubrique="${id}"]`).classList.toggle('rubrique--remplie', ok);
     }
     const total = Object.keys(RUBRIQUES).length;
+    // Les rappels disparaissent dès que la rubrique concernée est remplie.
+    const rappelSeance = $('[data-rappel="seance"]');
+    if (rappelSeance) rappelSeance.hidden = checkin.seance !== null;
+    const rappelCheckin = $('[data-rappel="checkin"]');
+    if (rappelCheckin) rappelCheckin.hidden = remplies === total;
     $('[data-role="progression"]').textContent =
       remplies === total ? 'Check-in complet' : `${remplies} rubrique${remplies > 1 ? 's' : ''} sur ${total}`;
     $('[data-role="progression"]').classList.toggle('jours__etat--complet', remplies === total);

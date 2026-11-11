@@ -3,7 +3,9 @@
 Application web progressive (PWA) personnelle de suivi de transformation physique.
 Tout reste sur l'appareil : pas de serveur, pas de compte, pas de service tiers.
 
-**État actuel : jalon J4** — check-in quotidien, programme d'entraînement et mode séance, suivi du poids et du tour de taille avec graphique sur 6 mois, export JSON.
+**Version 1.0.0** — check-in quotidien, programme d'entraînement et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire, rappels, sauvegarde et restauration JSON.
+
+App en ligne : <https://medbensito.github.io/ATHLETICS/> (dépôt `medbensito/ATHLETICS`, GitHub Pages sur la branche `main`).
 
 ## Structure du projet
 
@@ -17,10 +19,12 @@ ATHLETICS/
 │   ├── app.js            Routeur, démarrage, service worker
 │   ├── db.js             Accès à IndexedDB (lecture, écriture, structure)
 │   ├── dates.js          Dates et durées (clé de jour, durée de sommeil)
-│   ├── sauvegarde.js     Export JSON
+│   ├── sauvegarde.js     Export et import JSON
 │   ├── programme.js      Programme et journal des séances : données et calculs
 │   ├── corps.js          Mesures, période de 6 mois, tendance : données et calculs
 │   ├── graphique.js      Graphique SVG (sans bibliothèque) et bulle au toucher
+│   ├── bilan.js          Bilan hebdomadaire : calculs et message de la semaine
+│   ├── rappels.js        Rappels dans l'app et fichier calendrier (.ics)
 │   ├── plateforme.js     Détection iOS / app installée, état technique
 │   ├── ui.js             Morceaux d'interface partagés
 │   ├── version.js        Numéro de version affiché dans les réglages
@@ -30,7 +34,8 @@ ATHLETICS/
 │       ├── seance-en-cours.js  Mode séance et chronomètre de repos
 │       ├── exercice.js   Historique d'un exercice
 │       ├── corps.js      Écran « Corps » : mesures, graphiques, période
-│       └── reglages.js   Écran « Réglages » : sauvegarde, état de l'app
+│       ├── bilan.js      Écran « Bilan » : le point de la semaine
+│       └── reglages.js   Écran « Réglages » : rappels, sauvegarde, état de l'app
 ├── icons/                Icônes 180 (iOS), 192, 512 et 512 « maskable »
 ├── README.md             Ce fichier
 └── NOTES-TECHNIQUES.md   Choix techniques et points à vérifier sur iPhone
@@ -73,6 +78,25 @@ ATHLETICS/
 - La tendance apparaît à partir de 3 mesures sur au moins 2 semaines.
 - **Période et objectifs** (en bas de l'écran) : la période démarre à la première mesure et dure 6 mois ; les deux dates sont modifiables. Poids et tour de taille visés sont facultatifs et n'ajoutent qu'un repère sur la courbe.
 - **Toutes les mesures** : liste complète, pour modifier ou supprimer une mesure.
+
+## Utiliser le bilan
+
+- Onglet **Bilan** : la semaine en cours (lundi → dimanche), et les semaines passées avec les flèches ‹ ›.
+- **Régularité** : séances faites sur prévues (prévues = nombre de séances du programme), check-ins remplis sur les jours écoulés.
+- **Sommeil** (durée et qualité moyennes), **cigarettes** par jour, **alimentation** (part de repas équilibrés, jours sans grignotage, jours sans boisson sucrée), chacun comparé à la semaine précédente.
+- Une séance compte si elle a été terminée dans l'app **ou** si le check-in indique « faite ».
+- Les moyennes ne portent que sur les jours renseignés : un jour vide ne compte jamais comme un zéro.
+- Le message de la semaine ne reprend que des faits encourageants ; les chiffres, eux, restent complets.
+- Le nombre de repas par jour (3 par défaut) se règle dans Réglages.
+
+## Rappels
+
+Sur iPhone, une app web sans serveur ne peut pas envoyer de notification quand elle est fermée. L'app propose deux rappels complémentaires (Réglages → **Rappels**) :
+
+1. **Dans l'app** : à partir de l'heure du check-in du soir, l'écran Aujourd'hui affiche un rappel tant que le check-in est incomplet. Les jours d'entraînement, un rappel de séance apparaît une heure avant l'heure choisie, jusqu'à ce que la séance soit notée.
+2. **Dans Calendrier** : **Ajouter les rappels au calendrier** produit un fichier `.ics` avec deux événements récurrents et leurs alarmes (check-in chaque jour, séance les jours choisis). Ouvre-le et choisis **Ajouter tout**. Ces alarmes sonnent même app fermée.
+
+Après un changement d'heure ou de jours, recréer le fichier calendrier (et supprimer les anciens événements dans Calendrier s'ils apparaissent en double).
 
 ## Lancer en local (ordinateur)
 
@@ -119,15 +143,16 @@ Toujours utiliser l'app depuis l'icône. L'app installée et l'onglet Safari ont
 > Safari peut effacer les données d'un site **non installé** après 7 jours sans visite. Installer l'app sur l'écran d'accueil évite cette purge, mais une sauvegarde régulière reste la seule vraie sécurité (changement de téléphone, désinstallation, réinitialisation).
 
 - **Exporter** : Réglages → **Exporter mes données**. Sur iPhone, la feuille de partage s'ouvre : choisir **Enregistrer dans Fichiers** (iCloud Drive de préférence). Sur ordinateur, le fichier est téléchargé.
-- Le fichier s'appelle `athletics-sauvegarde-AAAA-MM-JJ.json` et contient toutes les données.
+- Le fichier s'appelle `athletics-sauvegarde-AAAA-MM-JJ.json` et contient toutes les données (check-ins, programme, séances, mesures, réglages).
 - L'app rappelle discrètement de sauvegarder quand le dernier export date de plus de 7 jours.
-- L'import (restauration) arrive au jalon J5.
+- **Importer** : Réglages → **Importer une sauvegarde**, choisir le fichier. L'app affiche d'abord son contenu ; rien n'est modifié tant que **Remplacer par cette sauvegarde** n'est pas confirmé. L'import **remplace toutes** les données actuelles : exporter d'abord pour les garder. Un fichier abîmé ou étranger est refusé sans rien toucher.
+- Changer de téléphone : exporter sur l'ancien, installer l'app sur le nouveau, importer.
 - Rythme conseillé : un export par semaine, enregistré dans Fichiers / iCloud Drive.
 - Supprimer l'icône de l'écran d'accueil **supprime les données** de l'app : exporter avant.
 
 ## Mettre à jour l'app
 
-Après chaque modification mise en ligne :
+Le site est publié par GitHub Pages depuis la branche `main` : un `git push` suffit, l'adresse ne change pas. Avant de pousser :
 
 1. Incrémenter `VERSION` dans `sw.js` et `VERSION_APP` dans `js/version.js`.
 2. Si un fichier a été ajouté, l'inscrire dans la liste `FICHIERS` de `sw.js`.
@@ -141,4 +166,4 @@ Les mises à jour ne touchent jamais les données saisies.
 - [x] **J2** — check-in quotidien, stockage IndexedDB, export JSON
 - [x] **J3** — programme d'entraînement éditable, mode séance avec chronomètre
 - [x] **J4** — suivi corporel, graphique sur 6 mois
-- [ ] **J5** — bilan hebdomadaire, rappels, import JSON, finitions
+- [x] **J5** — bilan hebdomadaire, rappels, import JSON, finitions

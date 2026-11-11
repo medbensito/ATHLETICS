@@ -13,12 +13,13 @@ import { nomJour } from '../dates.js';
 import { echapper } from '../ui.js';
 import {
   lireProgramme, creerSeancesVides, chargerExemple, nouvelleSeance, nouvelExercice,
-  formatCharge, lireNombre, trouverEnCours, preparerSeance, compterSeries, dureeMinutes, prendreMessage,
+  formatCharge, lireNombre, trouverEnCours, compterSeries, dureeMinutes, prendreMessage,
 } from '../programme.js';
 import {
   lirePlan, demarrerPlan, appliquerPhase, semaineDuPlan, phasePourSemaine, phase as phaseNumero,
   estSemaineAllegee, DUREE_SEMAINES, PHASES, planAncien,
 } from '../plan.js';
+import { demarrerSeance, NOMS_JOURS_LONGS } from '../seance-du-jour.js';
 import * as enCours from './seance-en-cours.js';
 import * as exercice from './exercice.js';
 
@@ -118,14 +119,9 @@ async function liste(racine, entete) {
         await creerSeancesVides();
         await rendre();
         return;
-      case 'demarrer': {
-        if (trouverEnCours(await lireTout('journal'))) { location.hash = '#/seances/en-cours'; return; }
-        const seance = await lire('seances', cible.dataset.id);
-        if (!seance) return;
-        await ecrire('journal', preparerSeance(seance, journal, { allegee: estSemaineAllegee(plan) }));
-        location.hash = '#/seances/en-cours';
+      case 'demarrer':
+        if (await demarrerSeance(cible.dataset.id)) location.hash = '#/seances/en-cours';
         return;
-      }
       case 'plan-adopter':
         if (!confirm('Remplacer les séances actuelles par le programme sur-mesure (phase 1) ? Les séances déjà réalisées et leur historique sont conservés.')) return;
         await demarrerPlan();
@@ -246,6 +242,13 @@ async function editeur(racine, id, entete) {
         <span class="champ__libelle">Nom de la séance</span>
         <input class="saisie" data-role="nom-seance" value="${echapper(seance.nom)}" placeholder="Ex. Jambes" maxlength="40" autocomplete="off">
       </label>
+      <label class="champ">
+        <span class="champ__libelle">Jour</span>
+        <select class="saisie saisie--select" data-role="jour-seance">
+          <option value="" ${seance.jour === undefined || seance.jour === null ? 'selected' : ''}>Libre (pas de jour fixe)</option>
+          ${[1, 2, 3, 4, 5, 6, 0].map((j) => `<option value="${j}" ${seance.jour === j ? 'selected' : ''}>${NOMS_JOURS_LONGS[j]}</option>`).join('')}
+        </select>
+      </label>
       ${seance.exercices.map((ex, i) => `
         <section class="carte exo-edit">
           <input class="saisie" data-ex="${i}" data-champ="nom" value="${echapper(ex.nom)}" placeholder="Nom de l'exercice" maxlength="60" autocomplete="off" aria-label="Nom de l'exercice ${i + 1}">
@@ -278,6 +281,8 @@ async function editeur(racine, id, entete) {
     const champ = evt.target;
     if (champ.dataset.role === 'nom-seance') {
       seance.nom = champ.value;
+    } else if (champ.dataset.role === 'jour-seance') {
+      seance.jour = champ.value === '' ? null : Number(champ.value);
     } else if (champ.dataset.champ) {
       const ex = seance.exercices[Number(champ.dataset.ex)];
       const limites = {

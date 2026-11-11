@@ -174,6 +174,25 @@ Document tenu à jour à chaque jalon : choix faits, et points à vérifier sur 
 - [ ] Les rappels de séance tombent les mardis, mercredis, jeudis, samedis et dimanches (Réglages → Rappels) ; régénérer le fichier calendrier.
 - [ ] Durée réelle d'une séance de phase 1 : si elle dépasse nettement 1 h 15, réduire le cardio ou une série d'isolation.
 
+## Choix techniques (1.3 — séance du jour, remplacement d'exercice)
+
+| Sujet | Choix | Raison |
+|---|---|---|
+| Jour d'une séance | Champ `jour` sur chaque séance (0 = dimanche, `null` = libre), rempli par le programme, modifiable dans l'éditeur | Fonctionne aussi pour un programme fait à la main. |
+| Programme adopté en 1.2 | Sans champ `jour`, les jours du programme suivent l'ordre des séances | Rien à refaire pour un programme déjà en place. |
+| Carte de l'accueil | Séance en cours → Reprendre ; sinon séance du jour → Démarrer ; sinon jour de repos | Une seule carte, la plus utile au moment présent. Elle remplace le rappel de séance quand les jours sont connus. |
+| Démarrage | Fonction commune `demarrerSeance()` (accueil et onglet Séances), sans effet si une séance est déjà en cours ; bouton désactivé pendant le démarrage | Une seule logique ; impossible de lancer deux séances. |
+| Alternatives | Catalogue de groupes de mouvements équivalents (`js/alternatives.js`) ; saisie libre possible | Couvre tous les exercices du programme, sans service externe. |
+| Remplacement | Possible tant qu'aucune série de l'exercice n'est validée | Les séries déjà faites restent attribuées au bon exercice. |
+| Historique | Le remplaçant reçoit un nouvel identifiant ; ses charges sont reprises de sa dernière exécution (par nom) | L'historique du développé couché ne se mélange pas avec celui des pompes. |
+| Durée du changement | « Pour cette séance » ne touche que le journal ; « Aussi les prochaines fois » modifie aussi le programme | Une machine occupée n'est pas une décision durable. |
+
+## Points à vérifier sur iPhone (1.3)
+
+- [ ] Un mardi, l'accueil propose Push ; « Démarrer » ouvre directement la séance.
+- [ ] En séance, « Remplacer » affiche les alternatives ; la saisie libre ouvre le clavier sans zoom.
+- [ ] Le sélecteur « Jour » de l'éditeur ouvre la roue iOS.
+
 ## Récapitulatif : ce qui ne peut être vérifié que sur un vrai iPhone
 
 - Installation, plein écran, encoche et barre d'accueil (J1).

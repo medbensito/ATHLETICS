@@ -13,9 +13,10 @@ import { lire, lireTout, ecrire, supprimer } from '../db.js';
 import { echapper } from '../ui.js';
 import {
   trouverEnCours, historiqueExercice, formatCharge, formatSerie, lireNombre,
-  compterSeries, dureeMinutes, laisserMessage, PAS_CHARGE, unite,
+  compterSeries, dureeMinutes, laisserMessage, PAS_CHARGE, unite, nouvelId,
 } from '../programme.js';
 import { checkinVide } from './checkin.js';
+import { alternatives } from '../alternatives.js';
 
 // ---------- Signal de fin de repos ----------
 
@@ -77,6 +78,8 @@ export async function monter(racine, params, entete) {
 
   // Charge affichée au moment du rendu : sert à savoir si l'utilisateur l'a changée.
   let chargeInitiale = null;
+  // Panneau « Remplacer » ouvert : { index de l'exercice, choix (rang dans les alternatives ou -1), message }
+  let remplacement = null;
   let reposSignale = false;
 
   function compteurNombre(champ, libelle, valeur, decimal) {
@@ -90,6 +93,67 @@ export async function monter(racine, params, entete) {
           <button type="button" class="compteur__bouton" data-action="pas" data-champ="${champ}" data-pas="1" aria-label="Augmenter ${libelle.toLowerCase()}">+</button>
         </div>
       </div>`;
+  }
+
+  /** Panneau de remplacement : alternatives connues, saisie libre, portée du changement. */
+  function panneauRemplacement(ex) {
+    const alts = alternatives(ex.nom);
+    return `
+      <div class="remplacer">
+        <p class="carte__titre">Remplacer par…</p>
+        ${alts.length
+          ? `<div class="pilules">${alts.map((a, k) => `
+              <button type="button" class="pilule pilule--choix" data-action="remplacer-choisir" data-k="${k}" aria-pressed="${remplacement.choix === k}">${echapper(a.nom)}</button>`).join('')}</div>`
+          : '<p class="carte__note">Pas d\'alternative connue pour cet exercice : saisis celui que tu fais.</p>'}
+        <input class="saisie" data-role="remplacer-libre" placeholder="Autre exercice" maxlength="60" autocomplete="off" aria-label="Autre exercice">
+        ${remplacement.message ? `<p class="carte__note" role="alert">${echapper(remplacement.message)}</p>` : ''}
+        <button type="button" class="bouton" data-action="remplacer-valider" data-duree="seance">Pour cette séance</button>
+        <button type="button" class="bouton bouton--secondaire" data-action="remplacer-valider" data-duree="toujours">Aussi les prochaines fois</button>
+        <p class="carte__note">« Aussi les prochaines fois » modifie le programme. Avec le programme sur-mesure, le changement dure jusqu'au prochain passage de phase.</p>
+        <button type="button" class="lien lien--discret lien--centre" data-action="remplacer-annuler">Annuler</button>
+      </div>`;
+  }
+
+  /**
+   * Remplace l'exercice i par « choix » ({ nom, consigne, unite, sansCharge }).
+   * L'exercice reçoit un nouvel identifiant : chaque exercice garde son propre historique,
+   * et les charges sont reprises de la dernière fois où le remplaçant a été fait.
+   */
+  async function remplacer(i, choix, toujours) {
+    const ex = seance.exercices[i];
+    const u = choix.unite || 'reps';
+    const memeUnite = u === (ex.unite || 'reps');
+    const repsVisees = memeUnite ? (ex.cible.reps || 10) : { reps: 10, s: 30, min: 10 }[u];
+    const historique = historiqueExercice(journal, null, choix.nom).pop() || null;
+    const id = nouvelId();
+
+    if (toujours) {
+      const programme = await lire('seances', seance.seanceId);
+      const cibleProgramme = programme && programme.exercices.find((x) => x.id === ex.exerciceId);
+      if (cibleProgramme) {
+        Object.assign(cibleProgramme, {
+          id, nom: choix.nom, consigne: choix.consigne || '', unite: u, sansCharge: Boolean(choix.sansCharge),
+          charge: null, reps: memeUnite ? cibleProgramme.reps : repsVisees,
+        });
+        await ecrire('seances', programme);
+      }
+    }
+
+    Object.assign(ex, {
+      exerciceId: id,
+      remplace: ex.remplace || ex.nom,
+      nom: choix.nom,
+      consigne: choix.consigne || '',
+      unite: u,
+      sansCharge: Boolean(choix.sansCharge) || u === 'min',
+      progression: false,
+      cible: { ...ex.cible, reps: repsVisees, charge: null },
+      series: ex.series.map((_, n) => {
+        const ref = historique ? historique.series[Math.min(n, historique.series.length - 1)] : null;
+        return { charge: ref ? ref.charge : null, reps: ref ? ref.reps : repsVisees, fait: false };
+      }),
+    });
+    dernierPassage[i] = historique;
   }
 
   function rendre() {
@@ -122,6 +186,7 @@ export async function monter(racine, params, entete) {
       <section class="carte exo">
         <p class="exo__position">Exercice ${i + 1} sur ${seance.exercices.length}</p>
         <h2 class="exo__nom">${echapper(ex.nom)}</h2>
+        ${ex.remplace ? `<p class="carte__note">Remplace : ${echapper(ex.remplace)}</p>` : ''}
         ${ex.consigne ? `<p class="exo__consigne">${echapper(ex.consigne)}</p>` : ''}
         ${serie ? `
           <p class="exo__serie">Série ${n + 1} sur ${ex.series.length}</p>
@@ -141,10 +206,12 @@ export async function monter(racine, params, entete) {
           <div class="pilules">${faites}</div>
           ${suivant !== -1 ? `<button type="button" class="bouton" data-action="aller" data-index="${suivant}">Exercice suivant</button>` : ''}
         `}
+        ${remplacement && remplacement.index === i ? panneauRemplacement(ex) : `
         <div class="exo__liens">
-          <button type="button" class="lien" data-action="ajouter-serie">+ Ajouter une série</button>
+          <button type="button" class="lien" data-action="ajouter-serie">+ Série</button>
+          ${ex.series.some((s) => s.fait) ? '' : '<button type="button" class="lien" data-action="remplacer-ouvrir">Remplacer</button>'}
           <a class="lien" href="#/seances/exercice/${ex.exerciceId}">Historique</a>
-        </div>
+        </div>`}
       </section>
 
       <section class="carte">
@@ -269,6 +336,38 @@ export async function monter(racine, params, entete) {
       case 'aller':
         seance.courant = Number(cible.dataset.index);
         break;
+
+      case 'remplacer-ouvrir':
+        remplacement = { index: seance.courant, choix: -1, message: '' };
+        break;
+
+      case 'remplacer-choisir':
+        remplacement.choix = Number(cible.dataset.k);
+        remplacement.message = '';
+        rendre();
+        return;
+
+      case 'remplacer-annuler':
+        remplacement = null;
+        rendre();
+        return;
+
+      case 'remplacer-valider': {
+        const libre = racine.querySelector('[data-role="remplacer-libre"]').value.trim();
+        const alts = alternatives(ex.nom);
+        // La saisie libre garde l'unité de l'exercice remplacé.
+        const choix = libre
+          ? { nom: libre, consigne: '', unite: ex.unite || 'reps', sansCharge: ex.sansCharge }
+          : alts[remplacement.choix];
+        if (!choix) {
+          remplacement.message = 'Choisis un exercice ou saisis-en un.';
+          rendre();
+          return;
+        }
+        await remplacer(seance.courant, choix, cible.dataset.duree === 'toujours');
+        remplacement = null;
+        break;
+      }
 
       case 'ajouter-serie': {
         const modele = ex.series[ex.series.length - 1];

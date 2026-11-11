@@ -3,7 +3,7 @@
 Application web progressive (PWA) personnelle de suivi de transformation physique.
 Tout reste sur l'appareil : pas de serveur, pas de compte, pas de service tiers.
 
-**Version 1.2.0** — check-in quotidien, programme sur-mesure de 6 mois (Push / Pull / Legs / Upper / Lower) et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire, rappels, sauvegarde et restauration JSON.
+**Version 1.3.0** — check-in quotidien et séance du jour, programme sur-mesure de 6 mois (Push / Pull / Legs / Upper / Lower) et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire, rappels, sauvegarde et restauration JSON.
 
 App en ligne : <https://medbensito.github.io/ATHLETICS/> (dépôt `medbensito/ATHLETICS`, GitHub Pages sur la branche `main`).
 
@@ -26,6 +26,8 @@ ATHLETICS/
 │   ├── bilan.js          Bilan hebdomadaire : calculs et message de la semaine
 │   ├── rappels.js        Rappels dans l'app et fichier calendrier (.ics)
 │   ├── plan.js           Programme sur-mesure 6 mois : contenu et phases
+│   ├── seance-du-jour.js Séance prévue aujourd'hui, démarrage d'une séance
+│   ├── alternatives.js   Exercices de remplacement, par groupes de mouvements
 │   ├── plateforme.js     Détection iOS / app installée, état technique
 │   ├── ui.js             Morceaux d'interface partagés
 │   ├── version.js        Numéro de version affiché dans les réglages
@@ -51,6 +53,13 @@ ATHLETICS/
 - Compteurs (repas équilibrés, cigarettes) : depuis l'état vide, **−** note zéro et **+** note 1.
 - Sommeil : il s'agit de la nuit qui précède le jour affiché. La durée est calculée automatiquement, y compris quand la nuit passe minuit. Dès qu'une nuit a été saisie, un bouton propose de reprendre les mêmes heures.
 - Les flèches **‹ ›** permettent de remplir ou corriger un jour passé.
+
+## Séance du jour
+
+- Chaque séance peut avoir un jour (le programme sur-mesure les règle : mardi Push, mercredi Pull, jeudi Legs, samedi Upper, dimanche Lower). Le jour se change dans l'éditeur, ou se met sur « Libre ».
+- L'écran **Aujourd'hui** affiche la séance prévue avec un bouton **Démarrer** : un appui et le mode séance s'ouvre. Une séance commencée y apparaît avec **Reprendre**.
+- Les jours sans séance, l'écran indique un jour de repos et suggère une marche.
+- La carte disparaît dès que la séance est faite, ou si « Repos » ou « Non faite » est coché dans le check-in.
 
 ## Utiliser les séances
 
@@ -78,6 +87,7 @@ ATHLETICS/
 - La charge et les répétitions sont pré-remplies avec ce qui a été fait la dernière fois, sinon avec le programme. Les boutons − / + ajustent (2,5 kg par appui pour la charge) ; on peut aussi toucher le nombre pour le saisir.
 - **Série faite** valide la série et lance le chronomètre de repos (− 15 s, + 15 s, Passer). À la fin du repos, l'écran change de couleur et un signal sonore retentit si le son est disponible.
 - Une série validée par erreur : toucher sa pastille pour la corriger.
+- **Remplacer** (avant la première série d'un exercice) : machine occupée, matériel absent, gêne. L'app propose des exercices équivalents, ou en accepte un saisi librement. **Pour cette séance** ne change que la séance du jour ; **Aussi les prochaines fois** modifie aussi le programme. Chaque exercice garde son propre historique : un remplaçant déjà fait retrouve ses charges.
 - On peut passer d'un exercice à l'autre dans la liste, et ajouter une série.
 - **Terminer la séance** l'enregistre et coche « Séance : faite » dans le check-in du jour.
 - Si l'app est fermée en pleine séance, elle reprend où elle en était (carte « Séance en cours »).
@@ -183,3 +193,4 @@ Les mises à jour ne touchent jamais les données saisies.
 - [x] **J5** — bilan hebdomadaire, rappels, import JSON, finitions
 - [x] **1.1** — programme sur-mesure 6 mois, progression des charges, semaines allégées
 - [x] **1.2** — répartition Push / Pull / Legs / Upper / Lower (mar, mer, jeu, sam, dim)
+- [x] **1.3** — séance du jour à l'accueil, remplacement d'exercice en séance

@@ -15,7 +15,7 @@
  *
  * Réglage « plan » : { id: 'athletics-6m', version: 2, debut: '2026-11-09' (un lundi), phase: 1 }
  * version 1 = programme 1.1 (3 muscu + 2 cardio), version 2 = Push / Pull / Legs / Upper / Lower.
- * Les séances de la phase sont écrites dans le magasin « seances » : elles restent
+ * Les séances de la phase sont écrites dans le magasin « seances », chacune avec son jour : elles restent
  * entièrement modifiables. Le journal (séances réalisées) n'est jamais touché.
  */
 
@@ -321,6 +321,7 @@ export async function appliquerPhase(numero, debut = null) {
       repos: e.repos, unite: e.unite, consigne: e.consigne, sansCharge: e.sansCharge,
     })));
     seance.description = def.description;
+    seance.jour = JOURS_PLAN[ordre - 1] ?? null; // mar, mer, jeu, sam, dim
     await ecrire('seances', seance);
     ordre += 1;
   }

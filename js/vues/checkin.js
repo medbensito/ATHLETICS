@@ -24,11 +24,13 @@
  */
 
 import { lire, lireTout, ecrire } from '../db.js';
-import { cleJour, estCleJour, decalerJour, dateLongue, nomJour, dureeSommeil, formatDuree } from '../dates.js';
+import { cleJour, estCleJour, decalerJour, dateLongue, nomJour, dureeSommeil, formatDuree, depuisCle } from '../dates.js';
 import { echapper, carteInstallation } from '../ui.js';
 import { joursDepuisExport, formatAnciennete } from '../sauvegarde.js';
 import { carteRappelMesure } from './corps.js';
 import { lireRappels, rappelCheckinActif, rappelSeanceActif } from '../rappels.js';
+import { lirePlan, estSemaineAllegee } from '../plan.js';
+import { seanceDuJour, joursConnus, demarrerSeance, NOMS_JOURS_LONGS } from '../seance-du-jour.js';
 
 const LIMITES = { repas: 10, cigarettes: 99 };
 
@@ -165,12 +167,43 @@ export async function monter(racine, params, entete) {
 
   const $ = (sel) => racine.querySelector(sel);
 
-  // Rappels du jour (séance, check-in du soir), seulement pour aujourd'hui.
+  // Séance du jour et rappels (check-in du soir), seulement pour aujourd'hui.
   if (estAujourdhui) {
-    const rappels = await lireRappels();
-    const enCours = (await lireTout('journal')).some((j) => !j.fin);
+    const [rappels, journal, seances, plan] = await Promise.all([lireRappels(), lireTout('journal'), lireTout('seances'), lirePlan()]);
+    const enCours = journal.find((j) => !j.fin);
+    const faiteAujourdhui = journal.some((j) => j.fin && j.date === date);
+    const prevue = seanceDuJour(seances, plan, date);
     let cartes = '';
-    if (rappelSeanceActif(rappels) && !enCours) {
+
+    if (enCours) {
+      // Une séance commencée passe avant tout le reste.
+      cartes += `
+        <section class="carte carte--accent seance-jour">
+          <p class="exo__position">Séance en cours</p>
+          <h2 class="seance__nom">${echapper(enCours.nomSeance)}</h2>
+          <a class="bouton" href="#/seances/en-cours">Reprendre</a>
+        </section>`;
+    } else if (prevue && !faiteAujourdhui) {
+      // Séance prévue aujourd'hui : un appui pour démarrer. Masquée dès que la rubrique Séance est remplie.
+      const nb = prevue.exercices.length;
+      cartes += `
+        <section class="carte carte--accent seance-jour" data-rappel="seance">
+          <p class="exo__position">${NOMS_JOURS_LONGS[depuisCle(date).getDay()]} · séance du jour${estSemaineAllegee(plan) ? ' · semaine allégée' : ''}</p>
+          <h2 class="seance__nom">${echapper(prevue.nom)}</h2>
+          ${prevue.description ? `<p class="carte__texte">${echapper(prevue.description.replace(/^[^·]*·\s*/, ''))}</p>` : ''}
+          ${nb ? `<button type="button" class="bouton" data-action="demarrer-seance" data-id="${prevue.id}">Démarrer · ${nb} exercice${nb > 1 ? 's' : ''}</button>`
+            : `<a class="bouton bouton--secondaire" href="#/seances/modifier/${prevue.id}">Ajouter des exercices</a>`}
+          <p class="carte__note">Imprévu ou fatigue : coche simplement « Repos » plus bas.</p>
+        </section>`;
+    } else if (!prevue && !faiteAujourdhui && joursConnus(seances, plan)) {
+      cartes += `
+        <section class="carte seance-jour" data-rappel="seance">
+          <p class="exo__position">${NOMS_JOURS_LONGS[depuisCle(date).getDay()]} · jour de repos</p>
+          <p class="carte__texte">Pas de séance prévue. Une marche de 30 à 45 minutes, si tu en as envie : elle aide la perte de graisse sans gêner la récupération.</p>
+        </section>`;
+    }
+
+    if (!prevue && !joursConnus(seances, plan) && rappelSeanceActif(rappels) && !enCours) {
       cartes += `
         <a class="carte carte--lien carte--rappel" href="#/seances" data-rappel="seance">
           <span class="carte__titre">Séance prévue aujourd'hui</span>
@@ -250,7 +283,7 @@ export async function monter(racine, params, entete) {
 
   // --- Gestes ---
 
-  racine.addEventListener('click', (evt) => {
+  racine.addEventListener('click', async (evt) => {
     const cible = evt.target.closest('button');
     if (!cible) return;
 
@@ -269,6 +302,14 @@ export async function monter(racine, params, entete) {
       const actuel = checkin[champ];
       const suivant = actuel === null ? (pas > 0 ? 1 : 0) : Math.min(LIMITES[champ], Math.max(0, actuel + pas));
       modifier({ [champ]: suivant });
+      return;
+    }
+
+    // Démarrer la séance du jour.
+    if (cible.dataset.action === 'demarrer-seance') {
+      cible.disabled = true; // évite un double démarrage
+      if (await demarrerSeance(cible.dataset.id)) location.hash = '#/seances/en-cours';
+      else cible.disabled = false;
       return;
     }
 

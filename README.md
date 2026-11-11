@@ -3,7 +3,7 @@
 Application web progressive (PWA) personnelle de suivi de transformation physique.
 Tout reste sur l'appareil : pas de serveur, pas de compte, pas de service tiers.
 
-**État actuel : jalon J3** — check-in quotidien, programme d'entraînement éditable, mode séance avec chronomètre de repos, historique par exercice, export JSON.
+**État actuel : jalon J4** — check-in quotidien, programme d'entraînement et mode séance, suivi du poids et du tour de taille avec graphique sur 6 mois, export JSON.
 
 ## Structure du projet
 
@@ -19,6 +19,8 @@ ATHLETICS/
 │   ├── dates.js          Dates et durées (clé de jour, durée de sommeil)
 │   ├── sauvegarde.js     Export JSON
 │   ├── programme.js      Programme et journal des séances : données et calculs
+│   ├── corps.js          Mesures, période de 6 mois, tendance : données et calculs
+│   ├── graphique.js      Graphique SVG (sans bibliothèque) et bulle au toucher
 │   ├── plateforme.js     Détection iOS / app installée, état technique
 │   ├── ui.js             Morceaux d'interface partagés
 │   ├── version.js        Numéro de version affiché dans les réglages
@@ -27,6 +29,7 @@ ATHLETICS/
 │       ├── seances.js    Écran « Séances » : programme et éditeur
 │       ├── seance-en-cours.js  Mode séance et chronomètre de repos
 │       ├── exercice.js   Historique d'un exercice
+│       ├── corps.js      Écran « Corps » : mesures, graphiques, période
 │       └── reglages.js   Écran « Réglages » : sauvegarde, état de l'app
 ├── icons/                Icônes 180 (iOS), 192, 512 et 512 « maskable »
 ├── README.md             Ce fichier
@@ -61,6 +64,15 @@ ATHLETICS/
 - Si l'app est fermée en pleine séance, elle reprend où elle en était (carte « Séance en cours »).
 
 **Historique** : lien « Historique » dans le mode séance ou dans l'éditeur — dernière charge, meilleure charge et détail séance par séance avec l'écart d'une fois sur l'autre.
+
+## Utiliser le suivi corporel
+
+- Onglet **Corps** → **Mesure de la semaine** : poids (kg) et/ou tour de taille (cm), puis **Enregistrer**. Une seule mesure par jour ; ressaisir le même jour la met à jour.
+- Conseil : mesurer dans les mêmes conditions chaque semaine (même jour, le matin à jeun). L'accueil affiche un rappel discret quand la dernière mesure date de 7 jours ou plus.
+- **Graphiques** : un pour le poids, un pour le tour de taille. Ils couvrent la période de 6 mois, avec la date cible (trait vertical pointillé) et la tendance (droite pointillée, prolongée jusqu'à la date cible). Toucher le graphique affiche la valeur et la date de la mesure la plus proche.
+- La tendance apparaît à partir de 3 mesures sur au moins 2 semaines.
+- **Période et objectifs** (en bas de l'écran) : la période démarre à la première mesure et dure 6 mois ; les deux dates sont modifiables. Poids et tour de taille visés sont facultatifs et n'ajoutent qu'un repère sur la courbe.
+- **Toutes les mesures** : liste complète, pour modifier ou supprimer une mesure.
 
 ## Lancer en local (ordinateur)
 
@@ -128,5 +140,5 @@ Les mises à jour ne touchent jamais les données saisies.
 - [x] **J1** — structure, manifest, service worker, écran d'accueil vide
 - [x] **J2** — check-in quotidien, stockage IndexedDB, export JSON
 - [x] **J3** — programme d'entraînement éditable, mode séance avec chronomètre
-- [ ] **J4** — suivi corporel, graphique sur 6 mois
+- [x] **J4** — suivi corporel, graphique sur 6 mois
 - [ ] **J5** — bilan hebdomadaire, rappels, import JSON, finitions

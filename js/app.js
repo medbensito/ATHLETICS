@@ -19,6 +19,7 @@ import { cleJour } from './dates.js';
 import * as checkin from './vues/checkin.js';
 import * as reglages from './vues/reglages.js';
 import * as seances from './vues/seances.js';
+import * as corps from './vues/corps.js';
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -33,8 +34,7 @@ const provisoire = (titre, surTitre, accroche, texte, jalon) => ({
 const routes = {
   aujourdhui: checkin,
   seances,
-  corps: provisoire('Corps', 'Suivi', 'Poids et tour de taille',
-    'Une saisie par semaine et un graphique sur 6 mois avec la tendance et la date cible.', 'J4'),
+  corps,
   bilan: provisoire('Bilan', 'Semaine', 'Le point de la semaine',
     'Régularité, sommeil, cigarettes et repas équilibrés, résumés simplement.', 'J5'),
   reglages,

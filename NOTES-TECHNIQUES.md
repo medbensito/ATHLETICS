@@ -82,6 +82,31 @@ Document tenu à jour à chaque jalon : choix faits, et points à vérifier sur 
 - [ ] Fermer l'app en pleine séance puis la rouvrir : la carte « Séance en cours » permet de reprendre.
 - [ ] Les fenêtres de confirmation (terminer avec des séries restantes, abandonner, retirer) s'affichent bien.
 
+## Choix techniques (J4)
+
+| Sujet | Choix | Raison |
+|---|---|---|
+| Données | Magasin `mesures` (clé = date), base passée en version 3. Réglage `periode` : début, date cible, objectifs facultatifs. | Une mesure par jour, poids et tour de taille indépendants (l'un peut manquer). Données des jalons précédents conservées (vérifié). |
+| Rythme | Saisie libre, rappel à l'accueil après 7 jours sans mesure | « Hebdomadaire » sans contrainte : une mesure en retard reste possible, sans message culpabilisant. |
+| Période | Démarre à la première mesure, dure 6 mois ; figée à la première mesure, modifiable ensuite | La date cible ne bouge pas toute seule. |
+| Objectifs | Facultatifs, saisis par l'utilisateur, simple trait horizontal | Aucun objectif imposé ni calculé. |
+| Graphique | SVG fait main, sans bibliothèque | Léger, hors ligne, aucune dépendance. |
+| Deux graphiques | Un par mesure, chacun avec son propre axe | Le kg et le cm n'ont pas la même échelle : un graphique à deux axes serait trompeur. |
+| Tendance | Régression linéaire sur toutes les mesures de la période, prolongée jusqu'à la date cible ; affichée à partir de 3 mesures sur 14 jours | Lisse les variations d'une semaine à l'autre. Moins de recul donnerait une droite peu fiable. |
+| Résumé | Dernière valeur, écart depuis le début, tendance par semaine | Chiffres neutres : ni rouge ni vert, aucun jugement. |
+| Toucher | Bulle avec valeur et date de la mesure la plus proche | Lecture précise sans surcharger le graphique d'étiquettes. |
+| Couleur | Vert de l'app pour les mesures, gris pour la tendance et les repères | Contraste vérifié sur le fond sombre. |
+| Écran Corps | Gestionnaires d'événements posés une seule fois, rendu séparé | Évite les actions en double après une mise à jour de l'écran. |
+
+## Points à vérifier sur iPhone (J4)
+
+- [ ] La mise à jour arrive (Réglages affiche 0.4.0) ; check-ins, programme et séances sont toujours là.
+- [ ] Les champs Poids et Tour de taille ouvrent un pavé numérique avec la virgule.
+- [ ] Le champ Date ouvre le calendrier iOS et s'affiche sans être tronqué.
+- [ ] Toucher le graphique affiche la bulle ; faire défiler la page en partant du graphique reste possible.
+- [ ] Les libellés du graphique (mois, valeurs, date cible) sont lisibles sans zoom.
+- [ ] Le bloc « Période et objectifs » s'ouvre et se ferme.
+
 ## Limite connue à anticiper : les rappels (J5)
 
 Sur iOS, une PWA installée peut recevoir des notifications, mais uniquement des notifications **push envoyées par un serveur**. Une app sans backend ne peut pas programmer une notification qui se déclenche quand elle est fermée.

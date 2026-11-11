@@ -27,6 +27,7 @@ import { lire, lireTout, ecrire } from '../db.js';
 import { cleJour, estCleJour, decalerJour, dateLongue, nomJour, dureeSommeil, formatDuree } from '../dates.js';
 import { echapper, carteInstallation } from '../ui.js';
 import { joursDepuisExport, formatAnciennete } from '../sauvegarde.js';
+import { carteRappelMesure } from './corps.js';
 
 const LIMITES = { repas: 10, cigarettes: 99 };
 
@@ -159,7 +160,7 @@ export async function monter(racine, params, entete) {
   const habitude = precedent ? { coucher: precedent.coucher, lever: precedent.lever } : null;
 
   racine.innerHTML = gabarit(date, estAujourdhui, habitude)
-    + (estAujourdhui ? await carteSauvegarde(tous.length) + carteInstallation() : '');
+    + (estAujourdhui ? await carteRappelMesure() + await carteSauvegarde(tous.length) + carteInstallation() : '');
 
   const $ = (sel) => racine.querySelector(sel);
   const champCoucher = $('[data-heure="coucher"]');

@@ -6,6 +6,7 @@
  *   - reglages : paires clé / valeur (ex. date du dernier export)
  *   - seances  : le programme d'entraînement (voir js/programme.js)
  *   - journal  : les séances réalisées (voir js/programme.js)
+ *   - mesures  : poids et tour de taille, une mesure par date (voir js/corps.js)
  *
  * Pour ajouter un magasin dans un jalon futur :
  *   1. incrémenter VERSION_DB
@@ -14,10 +15,10 @@
  */
 
 const NOM_DB = 'athletics';
-const VERSION_DB = 2;
+const VERSION_DB = 3;
 
 /** Liste des magasins, utilisée par l'export. */
-export const MAGASINS = ['checkins', 'reglages', 'seances', 'journal'];
+export const MAGASINS = ['checkins', 'reglages', 'seances', 'journal', 'mesures'];
 
 /** Crée ou fait évoluer la structure. Ne supprime jamais de données. */
 function migrer(db, ancienne) {
@@ -28,6 +29,9 @@ function migrer(db, ancienne) {
   if (ancienne < 2) { // J3 : programme et journal des séances
     db.createObjectStore('seances', { keyPath: 'id' });
     db.createObjectStore('journal', { keyPath: 'id' });
+  }
+  if (ancienne < 3) { // J4 : suivi corporel
+    db.createObjectStore('mesures', { keyPath: 'date' });
   }
 }
 

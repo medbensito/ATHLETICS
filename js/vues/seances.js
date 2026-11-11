@@ -17,7 +17,7 @@ import {
 } from '../programme.js';
 import {
   lirePlan, demarrerPlan, appliquerPhase, semaineDuPlan, phasePourSemaine, phase as phaseNumero,
-  estSemaineAllegee, DUREE_SEMAINES, PHASES,
+  estSemaineAllegee, DUREE_SEMAINES, PHASES, planAncien,
 } from '../plan.js';
 import * as enCours from './seance-en-cours.js';
 import * as exercice from './exercice.js';
@@ -54,7 +54,7 @@ async function liste(racine, entete) {
           <h2 class="carte__titre">Créer ton programme</h2>
           <p class="carte__texte">Trois façons de commencer. Dans tous les cas, tout reste modifiable : noms, exercices, séries, répétitions, charges.</p>
           <button type="button" class="bouton" data-action="plan-demarrer">Programme sur-mesure 6 mois</button>
-          <p class="carte__note">Recommandé : 3 phases progressives pensées pour un départ très sédentaire, 3 séances de musculation et 2 de cardio par semaine.</p>
+          <p class="carte__note">Recommandé : Push, Pull, Legs, Upper, Lower (mardi, mercredi, jeudi, samedi, dimanche), en 3 phases progressives pensées pour un départ très sédentaire.</p>
           <button type="button" class="bouton bouton--secondaire" data-action="exemple">Partir d'un exemple simple</button>
           <button type="button" class="bouton bouton--secondaire" data-action="vides">Créer 5 séances vides</button>
           <p class="carte__note">Aucune charge n'est imposée : tu les choisis à la première séance.</p>
@@ -131,6 +131,11 @@ async function liste(racine, entete) {
         await demarrerPlan();
         await rendre('Programme sur-mesure en place : phase 1, Fondations.');
         return;
+      case 'plan-mettre-a-jour':
+        if (!confirm('Remplacer les séances actuelles par la nouvelle répartition (Push, Pull, Legs, Upper, Lower) ? Ta phase, ta semaine et ton historique sont conservés.')) return;
+        await appliquerPhase(plan.phase);
+        await rendre('Séances mises à jour : Push, Pull, Legs, Upper, Lower.');
+        return;
       case 'phase-suivante': {
         const numero = Number(cible.dataset.phase);
         if (!confirm(`Passer à la phase ${numero} ? Les séances du programme seront remplacées par celles de la phase ${numero} (tes modifications éventuelles de la phase actuelle seront perdues). L'historique est conservé.`)) return;
@@ -169,7 +174,7 @@ function cartePlan(plan) {
     return `
       <section class="carte carte--accent">
         <h2 class="carte__titre">Programme sur-mesure 6 mois</h2>
-        <p class="carte__texte">3 phases progressives (Fondations, Construction, Performance) pensées pour un départ très sédentaire : 3 séances de musculation et 2 de cardio par semaine, avec progression des charges proposée automatiquement.</p>
+        <p class="carte__texte">Push, Pull, Legs, Upper, Lower le mardi, mercredi, jeudi, samedi et dimanche, avec du cardio en fin de séance. 3 phases progressives (Fondations, Construction, Performance) pensées pour un départ très sédentaire, et une progression des charges proposée automatiquement.</p>
         <button type="button" class="bouton" data-action="plan-adopter">Adopter ce programme</button>
       </section>`;
   }
@@ -191,6 +196,9 @@ function cartePlan(plan) {
         <span class="barre__remplie" style="width:${Math.round((Math.min(semaine, DUREE_SEMAINES) / DUREE_SEMAINES) * 100)}%"></span>
       </div>
       ${allegee ? '<p class="carte__note">Cette semaine, une série de moins par exercice, à charge égale : le corps récupère et progresse ensuite.</p>' : ''}
+      ${planAncien(plan) ? `
+        <p class="carte__texte">Nouvelle répartition disponible : Push, Pull, Legs, Upper, Lower, le mardi, mercredi, jeudi, samedi et dimanche. Ta semaine et ta phase sont conservées.</p>
+        <button type="button" class="bouton" data-action="plan-mettre-a-jour">Mettre à jour mes séances</button>` : ''}
       ${suivante ? `
         <p class="carte__texte">La phase ${suivante.numero} (${echapper(suivante.nom)}) commence cette semaine.</p>
         <button type="button" class="bouton" data-action="phase-suivante" data-phase="${suivante.numero}">Passer à la phase ${suivante.numero}</button>` : ''}
@@ -201,7 +209,8 @@ function cartePlan(plan) {
           <li><strong>Progression :</strong> quand toutes les séries atteignent les répétitions visées, l'app propose + 2,5 kg la fois suivante.</li>
           <li><strong>Charges de départ :</strong> choisis-les à la première séance, assez légères pour une technique propre.</li>
           <li><strong>Cardio « zone 2 » :</strong> tu peux parler en phrases complètes. C'est l'allure qui sollicite le plus les graisses.</li>
-          <li><strong>Ordre des séances :</strong> du lundi au vendredi conseillé ; si tu en rates une, fais simplement la suivante.</li>
+          <li><strong>Semaine :</strong> Push le mardi, Pull le mercredi, Legs le jeudi, Upper le samedi, Lower le dimanche. Si tu rates une séance, fais simplement la suivante.</li>
+          <li><strong>Lundi et vendredi :</strong> repos. Une marche de 30 à 45 minutes ces jours-là aide beaucoup la perte de graisse.</li>
           <li><strong>Semaines allégées :</strong> 8, 16 et 24.</li>
           <li><strong>Sécurité :</strong> une douleur vive, une gêne dans la poitrine ou un essoufflement inhabituel, c'est stop.</li>
         </ul>

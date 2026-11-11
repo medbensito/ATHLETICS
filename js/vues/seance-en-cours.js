@@ -132,7 +132,7 @@ export async function monter(racine, params, entete) {
             : `Prévu : ${ex.cible.series} × ${ex.cible.reps ?? '—'}${ex.unite && ex.unite !== 'reps' ? ` ${unite(ex.unite).court}` : ''}${ex.cible.charge !== null && ex.cible.charge !== undefined ? ` à ${formatCharge(ex.cible.charge)} kg` : ''}`}</p>
           ${faites ? `<div class="pilules">${faites}</div>` : ''}
           <div class="nombres">
-            ${ex.unite === 'min' ? '' : compteurNombre('charge', 'Charge (kg)', serie.charge, true)}
+            ${ex.sansCharge || ex.unite === 'min' ? '' : compteurNombre('charge', 'Charge (kg)', serie.charge, true)}
             ${compteurNombre('reps', unite(ex.unite).saisie, serie.reps, false)}
           </div>
           <button type="button" class="bouton bouton--grand" data-action="valider">Série faite</button>

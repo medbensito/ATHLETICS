@@ -155,6 +155,25 @@ Document tenu à jour à chaque jalon : choix faits, et points à vérifier sur 
 - [ ] Deuxième passage d'un exercice réussi : la charge + 2,5 kg est proposée.
 - [ ] Le sélecteur d'unité de l'éditeur ouvre la roue iOS.
 
+## Choix techniques (1.2 — Push / Pull / Legs / Upper / Lower)
+
+| Sujet | Choix | Raison |
+|---|---|---|
+| Répartition | Push mardi, Pull mercredi, Legs jeudi, Upper samedi, Lower dimanche | Demandé. Chaque groupe musculaire est travaillé deux fois par semaine, avec au moins 48 h entre deux séances qui le sollicitent fortement (Legs jeudi → Lower dimanche). |
+| Lower ≠ Legs | Legs centré sur les quadriceps (squat, presse), Lower sur fessiers et ischios (hip thrust, soulevé de terre, fentes) | Varier les mouvements et limiter la fatigue cumulée des genoux. |
+| Cardio | En fin de chaque séance (10 à 20 min de zone 2), intervalles de 30 s le samedi à partir de la phase 2 | Plus de séance dédiée : le cardio reste présent pour la graisse viscérale et le souffle, sans gêner la musculation. 10 min seulement après Legs. |
+| Jours de repos | Lundi et vendredi, marche conseillée | Activité douce sans coût de récupération. |
+| Rappels | Adopter ou mettre à jour le programme règle les jours de rappel sur mar, mer, jeu, sam, dim ; les heures sont conservées | Cohérence avec le planning, sans écraser les heures choisies. Le fichier calendrier est à régénérer. |
+| Mise à niveau | `plan.version` (1 → 2) ; carte « Mettre à jour mes séances » pour un programme adopté en 1.1, phase et semaine conservées | Pas de remplacement silencieux des séances. |
+| Cardio sans charge | Drapeau `sansCharge` sur le cardio et les intervalles : pas de champ de charge, pas de série retirée en semaine allégée | Les intervalles se comptent en secondes mais n'ont pas de charge. |
+| Volume | 15 à 18 séries de musculation par séance en phase 1, 17 à 22 en phase 3 | Montée progressive adaptée à un départ très sédentaire. |
+
+## Points à vérifier sur iPhone (1.2)
+
+- [ ] Réglages affiche 1.2.0. Si le programme avait été adopté en 1.1, le bouton « Mettre à jour mes séances » apparaît.
+- [ ] Les rappels de séance tombent les mardis, mercredis, jeudis, samedis et dimanches (Réglages → Rappels) ; régénérer le fichier calendrier.
+- [ ] Durée réelle d'une séance de phase 1 : si elle dépasse nettement 1 h 15, réduire le cardio ou une série d'isolation.
+
 ## Récapitulatif : ce qui ne peut être vérifié que sur un vrai iPhone
 
 - Installation, plein écran, encoche et barre d'accueil (J1).

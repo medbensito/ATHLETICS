@@ -5,7 +5,7 @@
  * {
  *   id, ordre, nom: 'Jambes',
  *   exercices: [{ id, nom: 'Squat', series: 4, reps: 8, charge: 60 | null, repos: 90,
- *                 unite: 'reps' | 's' | 'min', consigne: '' }],
+ *                 unite: 'reps' | 's' | 'min', consigne: '', sansCharge: false }],
  *   description: ''                       ← facultatif (programme sur-mesure)
  * }
  * charge : en kg, null = poids du corps ou non défini. repos : en secondes.
@@ -167,7 +167,7 @@ export function preparerSeance(seance, journal, { allegee = false } = {}) {
       const u = ex.unite || 'reps';
       const dernier = historiqueExercice(journal, ex.id, ex.nom).pop();
       const prevues = Math.max(1, ex.series || 1);
-      const nb = allegee && u !== 'min' && prevues >= 3 ? prevues - 1 : prevues;
+      const nb = allegee && u !== 'min' && !ex.sansCharge && prevues >= 3 ? prevues - 1 : prevues;
 
       const progression = !allegee && u === 'reps' && Boolean(dernier) && dernier.meilleure !== null
         && Boolean(ex.reps) && dernier.series.length >= prevues
@@ -188,6 +188,7 @@ export function preparerSeance(seance, journal, { allegee = false } = {}) {
         repos: ex.repos ?? REPOS_DEFAUT,
         unite: u,
         consigne: ex.consigne || '',
+        sansCharge: Boolean(ex.sansCharge) || u === 'min',
         progression,
         cible: { series: nb, reps: ex.reps, charge: ex.charge },
         series,

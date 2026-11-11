@@ -3,7 +3,7 @@
 Application web progressive (PWA) personnelle de suivi de transformation physique.
 Tout reste sur l'appareil : pas de serveur, pas de compte, pas de service tiers.
 
-**Version 1.1.0** — check-in quotidien, programme sur-mesure de 6 mois et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire, rappels, sauvegarde et restauration JSON.
+**Version 1.2.0** — check-in quotidien, programme sur-mesure de 6 mois (Push / Pull / Legs / Upper / Lower) et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire, rappels, sauvegarde et restauration JSON.
 
 App en ligne : <https://medbensito.github.io/ATHLETICS/> (dépôt `medbensito/ATHLETICS`, GitHub Pages sur la branche `main`).
 
@@ -56,12 +56,15 @@ ATHLETICS/
 
 **Programme sur-mesure** (recommandé, détail dans `PROGRAMME.md`)
 
-- 26 semaines en 3 phases : **Fondations** (1–4), **Construction** (5–12), **Performance** (13–26). Chaque semaine : 3 séances de musculation et 2 de cardio.
+- 26 semaines en 3 phases : **Fondations** (1–4), **Construction** (5–12), **Performance** (13–26).
+- Chaque semaine : **Push** le mardi, **Pull** le mercredi, **Legs** le jeudi, **Upper** le samedi, **Lower** le dimanche ; repos le lundi et le vendredi. Cardio en fin de séance, intervalles le samedi à partir de la phase 2.
+- Adopter le programme règle les rappels de séance sur ces cinq jours (les heures ne changent pas).
 - Pour l'adopter : onglet Séances → **Programme sur-mesure 6 mois** (ou **Adopter ce programme** si un programme existe déjà). Les séances réalisées restent dans l'historique.
+- Programme adopté en version 1.1 : un bouton **Mettre à jour mes séances** applique la nouvelle répartition en gardant la semaine et la phase.
 - La carte du programme indique la phase et la semaine. Quand une phase commence, un bouton **Passer à la phase suivante** apparaît.
 - **Progression** : quand toutes les séries d'un exercice atteignent les répétitions visées, l'app propose + 2,5 kg la fois suivante.
 - **Semaines allégées** (8, 16, 24) : une série de moins par exercice de musculation, même charge.
-- Chaque exercice a une consigne et une unité (répétitions, secondes ou minutes). Pour les minutes (cardio), la charge n'est pas demandée ; pour les intervalles, le chronomètre de repos sert de phase lente.
+- Chaque exercice a une consigne et une unité (répétitions, secondes ou minutes). Pour le cardio et les intervalles, la charge n'est pas demandée et le chronomètre de repos sert de phase lente.
 
 **Programme** (onglet Séances)
 
@@ -179,3 +182,4 @@ Les mises à jour ne touchent jamais les données saisies.
 - [x] **J4** — suivi corporel, graphique sur 6 mois
 - [x] **J5** — bilan hebdomadaire, rappels, import JSON, finitions
 - [x] **1.1** — programme sur-mesure 6 mois, progression des charges, semaines allégées
+- [x] **1.2** — répartition Push / Pull / Legs / Upper / Lower (mar, mer, jeu, sam, dim)

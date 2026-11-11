@@ -13,7 +13,7 @@ import { lire, lireTout, ecrire, supprimer } from '../db.js';
 import { echapper } from '../ui.js';
 import {
   trouverEnCours, historiqueExercice, formatCharge, formatSerie, lireNombre,
-  compterSeries, dureeMinutes, laisserMessage, PAS_CHARGE,
+  compterSeries, dureeMinutes, laisserMessage, PAS_CHARGE, unite,
 } from '../programme.js';
 import { checkinVide } from './checkin.js';
 
@@ -104,10 +104,11 @@ export async function monter(racine, params, entete) {
     chargeInitiale = serie ? serie.charge : null;
 
     const faites = ex.series.map((s, k) => (s.fait
-      ? `<button type="button" class="pilule pilule--faite" data-action="rouvrir" data-serie="${k}" aria-label="Corriger la série ${k + 1}">${k + 1} · ${echapper(formatSerie(s))}</button>`
+      ? `<button type="button" class="pilule pilule--faite" data-action="rouvrir" data-serie="${k}" aria-label="Corriger la série ${k + 1}">${k + 1} · ${echapper(formatSerie(s, ex.unite))}</button>`
       : '')).join('');
 
     racine.innerHTML = `
+      ${seance.allegee ? '<p class="annonce annonce--douce">Semaine allégée : une série de moins, même charge. Récupérer fait partie du progrès.</p>' : ''}
       <section class="carte chrono" data-role="repos" hidden>
         <p class="chrono__libelle" data-role="repos-libelle">Repos</p>
         <p class="chrono__temps" data-role="repos-temps" aria-live="off">0:00</p>
@@ -121,15 +122,18 @@ export async function monter(racine, params, entete) {
       <section class="carte exo">
         <p class="exo__position">Exercice ${i + 1} sur ${seance.exercices.length}</p>
         <h2 class="exo__nom">${echapper(ex.nom)}</h2>
+        ${ex.consigne ? `<p class="exo__consigne">${echapper(ex.consigne)}</p>` : ''}
         ${serie ? `
           <p class="exo__serie">Série ${n + 1} sur ${ex.series.length}</p>
+          ${ex.progression && n === 0 && !ex.series.some((s) => s.fait)
+            ? `<p class="exo__progression">Objectif atteint la dernière fois : + ${formatCharge(PAS_CHARGE)} kg proposés.</p>` : ''}
           <p class="carte__note">${refDerniere
-            ? `La dernière fois : ${echapper(formatSerie(refDerniere))}`
-            : `Prévu : ${ex.cible.series} × ${ex.cible.reps ?? '—'}${ex.cible.charge !== null && ex.cible.charge !== undefined ? ` à ${formatCharge(ex.cible.charge)} kg` : ''}`}</p>
+            ? `La dernière fois : ${echapper(formatSerie(refDerniere, ex.unite))}`
+            : `Prévu : ${ex.cible.series} × ${ex.cible.reps ?? '—'}${ex.unite && ex.unite !== 'reps' ? ` ${unite(ex.unite).court}` : ''}${ex.cible.charge !== null && ex.cible.charge !== undefined ? ` à ${formatCharge(ex.cible.charge)} kg` : ''}`}</p>
           ${faites ? `<div class="pilules">${faites}</div>` : ''}
           <div class="nombres">
-            ${compteurNombre('charge', 'Charge (kg)', serie.charge, true)}
-            ${compteurNombre('reps', 'Répétitions', serie.reps, false)}
+            ${ex.unite === 'min' ? '' : compteurNombre('charge', 'Charge (kg)', serie.charge, true)}
+            ${compteurNombre('reps', unite(ex.unite).saisie, serie.reps, false)}
           </div>
           <button type="button" class="bouton bouton--grand" data-action="valider">Série faite</button>
         ` : `
@@ -188,8 +192,8 @@ export async function monter(racine, params, entete) {
   function lireSaisie(serie) {
     const charge = racine.querySelector('.nombre__champ[data-champ="charge"]');
     const reps = racine.querySelector('.nombre__champ[data-champ="reps"]');
-    if (!charge || !reps) return;
-    serie.charge = lireNombre(charge.value, { min: 0, max: 999 });
+    if (!reps) return;
+    if (charge) serie.charge = lireNombre(charge.value, { min: 0, max: 999 });
     serie.reps = lireNombre(reps.value, { entier: true, min: 0, max: 999 }) ?? 0;
   }
 
@@ -220,7 +224,7 @@ export async function monter(racine, params, entete) {
           serie.charge = nouvelle === 0 && serie.charge === null ? null : nouvelle;
           racine.querySelector('.nombre__champ[data-champ="charge"]').value = formatCharge(serie.charge);
         } else {
-          serie.reps = Math.max(0, serie.reps + sens);
+          serie.reps = Math.max(0, serie.reps + sens * unite(ex.unite).pas);
           racine.querySelector('.nombre__champ[data-champ="reps"]').value = serie.reps;
         }
         sauver();

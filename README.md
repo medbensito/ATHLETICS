@@ -3,7 +3,7 @@
 Application web progressive (PWA) personnelle de suivi de transformation physique.
 Tout reste sur l'appareil : pas de serveur, pas de compte, pas de service tiers.
 
-**Version 1.0.0** — check-in quotidien, programme d'entraînement et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire, rappels, sauvegarde et restauration JSON.
+**Version 1.1.0** — check-in quotidien, programme sur-mesure de 6 mois et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire, rappels, sauvegarde et restauration JSON.
 
 App en ligne : <https://medbensito.github.io/ATHLETICS/> (dépôt `medbensito/ATHLETICS`, GitHub Pages sur la branche `main`).
 
@@ -25,6 +25,7 @@ ATHLETICS/
 │   ├── graphique.js      Graphique SVG (sans bibliothèque) et bulle au toucher
 │   ├── bilan.js          Bilan hebdomadaire : calculs et message de la semaine
 │   ├── rappels.js        Rappels dans l'app et fichier calendrier (.ics)
+│   ├── plan.js           Programme sur-mesure 6 mois : contenu et phases
 │   ├── plateforme.js     Détection iOS / app installée, état technique
 │   ├── ui.js             Morceaux d'interface partagés
 │   ├── version.js        Numéro de version affiché dans les réglages
@@ -38,6 +39,7 @@ ATHLETICS/
 │       └── reglages.js   Écran « Réglages » : rappels, sauvegarde, état de l'app
 ├── icons/                Icônes 180 (iOS), 192, 512 et 512 « maskable »
 ├── README.md             Ce fichier
+├── PROGRAMME.md          Le programme sur-mesure en entier
 └── NOTES-TECHNIQUES.md   Choix techniques et points à vérifier sur iPhone
 ```
 
@@ -52,10 +54,19 @@ ATHLETICS/
 
 ## Utiliser les séances
 
+**Programme sur-mesure** (recommandé, détail dans `PROGRAMME.md`)
+
+- 26 semaines en 3 phases : **Fondations** (1–4), **Construction** (5–12), **Performance** (13–26). Chaque semaine : 3 séances de musculation et 2 de cardio.
+- Pour l'adopter : onglet Séances → **Programme sur-mesure 6 mois** (ou **Adopter ce programme** si un programme existe déjà). Les séances réalisées restent dans l'historique.
+- La carte du programme indique la phase et la semaine. Quand une phase commence, un bouton **Passer à la phase suivante** apparaît.
+- **Progression** : quand toutes les séries d'un exercice atteignent les répétitions visées, l'app propose + 2,5 kg la fois suivante.
+- **Semaines allégées** (8, 16, 24) : une série de moins par exercice de musculation, même charge.
+- Chaque exercice a une consigne et une unité (répétitions, secondes ou minutes). Pour les minutes (cardio), la charge n'est pas demandée ; pour les intervalles, le chronomètre de repos sert de phase lente.
+
 **Programme** (onglet Séances)
 
-- Au premier passage : partir d'un programme d'exemple ou de 5 séances vides. L'exemple n'est qu'une base à adapter ; il ne contient aucune charge.
-- **Modifier** ouvre l'éditeur : nom de la séance, et pour chaque exercice nom, séries, répétitions, charge (kg) et temps de repos (secondes). Les flèches ↑ ↓ changent l'ordre. Tout s'enregistre automatiquement.
+- Autres départs possibles : un programme d'exemple simple ou 5 séances vides. Aucune charge n'est imposée.
+- **Modifier** ouvre l'éditeur : nom de la séance, et pour chaque exercice nom, séries, quantité, charge (kg), temps de repos (secondes), unité et consigne. Les flèches ↑ ↓ changent l'ordre. Tout s'enregistre automatiquement.
 - Laisser « Kg » vide pour un exercice au poids du corps.
 - Modifier le programme ne change jamais les séances déjà réalisées.
 
@@ -167,3 +178,4 @@ Les mises à jour ne touchent jamais les données saisies.
 - [x] **J3** — programme d'entraînement éditable, mode séance avec chronomètre
 - [x] **J4** — suivi corporel, graphique sur 6 mois
 - [x] **J5** — bilan hebdomadaire, rappels, import JSON, finitions
+- [x] **1.1** — programme sur-mesure 6 mois, progression des charges, semaines allégées

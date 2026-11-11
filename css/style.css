@@ -576,6 +576,21 @@ input[type="date"].saisie::-webkit-date-and-time-value { text-align: center; }
 
 .carte--rappel { gap: 4px; box-shadow: inset 0 0 0 1px var(--accent); text-decoration: none; }
 
+/* ---------- Programme sur-mesure (1.1) ---------- */
+.carte--plan { gap: 10px; box-shadow: inset 0 0 0 1px var(--accent); }
+.carte--plan .barre { margin-top: 0; }
+.seance__description { color: var(--accent); font-size: 14px; font-weight: 600; }
+.depliable__titre--petit { font-size: 15px; color: var(--texte-doux); }
+.principes { display: grid; gap: 8px; padding-left: 1.1em; color: var(--texte-doux); font-size: 15px; }
+.principes strong { color: var(--texte); font-weight: 600; }
+
+.exo__consigne { color: var(--texte-doux); font-size: 15px; }
+.exo__progression { padding: 10px 14px; border-radius: 12px; background: var(--surface-2); color: var(--accent); font-size: 15px; font-weight: 600; }
+.annonce--douce { background: var(--surface); color: var(--texte); box-shadow: inset 0 0 0 1px var(--accent); font-weight: 600; }
+
+.exo-edit__options { display: grid; grid-template-columns: 130px 1fr; gap: 8px; }
+.saisie--select { padding: 0 10px; font-size: 15px; font-weight: 600; background-image: none; }
+
 /* ---------- Confort ---------- */
 @media (prefers-reduced-motion: no-preference) {
   .vue { animation: entree 0.22s ease-out both; }

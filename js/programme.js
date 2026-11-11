@@ -4,15 +4,19 @@
  * Magasin « seances » — le programme (ce qui est prévu) :
  * {
  *   id, ordre, nom: 'Jambes',
- *   exercices: [{ id, nom: 'Squat', series: 4, reps: 8, charge: 60 | null, repos: 90 }]
+ *   exercices: [{ id, nom: 'Squat', series: 4, reps: 8, charge: 60 | null, repos: 90,
+ *                 unite: 'reps' | 's' | 'min', consigne: '' }],
+ *   description: ''                       ← facultatif (programme sur-mesure)
  * }
  * charge : en kg, null = poids du corps ou non défini. repos : en secondes.
+ * unite : ce que compte « reps » (répétitions, secondes ou minutes). Absent = répétitions.
  *
  * Magasin « journal » — les séances réalisées (ce qui a été fait) :
  * {
  *   id, date: '2026-11-11', seanceId, nomSeance, debut, fin,   ← fin = null tant que la séance est en cours
- *   exercices: [{ exerciceId, nom, repos, cible: { series, reps, charge },
+ *   exercices: [{ exerciceId, nom, repos, unite, consigne, progression, cible: { series, reps, charge },
  *                 series: [{ charge, reps, fait }] }],
+ *   allegee: true | false  ← semaine allégée du programme sur-mesure
  *   courant: 0,            ← exercice affiché (séance en cours uniquement)
  *   reposFin: 1794420652528 | null   ← heure de fin du repos en cours
  * }
@@ -29,7 +33,15 @@ export const nouvelId = () =>
   (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
 
 export const nouvelExercice = (nom = '', series = 3, reps = 10) =>
-  ({ id: nouvelId(), nom, series, reps, charge: null, repos: REPOS_DEFAUT });
+  ({ id: nouvelId(), nom, series, reps, charge: null, repos: REPOS_DEFAUT, unite: 'reps', consigne: '' });
+
+/** Unités possibles d'un exercice : libellé court, libellé de saisie, pas des boutons − / +. */
+export const UNITES = {
+  reps: { court: 'rép.', saisie: 'Répétitions', pas: 1 },
+  s: { court: 's', saisie: 'Secondes', pas: 5 },
+  min: { court: 'min', saisie: 'Minutes', pas: 1 },
+};
+export const unite = (u) => UNITES[u] || UNITES.reps;
 
 export const nouvelleSeance = (nom, ordre, exercices = []) =>
   ({ id: nouvelId(), ordre, nom, exercices });
@@ -40,7 +52,10 @@ export const nouvelleSeance = (nom, ordre, exercices = []) =>
 export const formatCharge = (n) => (n === null || n === undefined ? '' : String(Math.round(n * 100) / 100).replace('.', ','));
 
 /** « 60 kg × 8 » ou « × 12 » sans charge. */
-export const formatSerie = (s) => (s.charge === null ? `× ${s.reps}` : `${formatCharge(s.charge)} kg × ${s.reps}`);
+export function formatSerie(s, u = 'reps') {
+  const quantite = u === 'reps' ? `× ${s.reps}` : `${s.reps} ${unite(u).court}`;
+  return s.charge === null || s.charge === undefined ? quantite : `${formatCharge(s.charge)} kg ${u === 'reps' ? '' : '· '}${quantite}`;
+}
 
 /** Lit un nombre saisi (virgule ou point). Renvoie null si vide ou invalide. */
 export function lireNombre(texte, { entier = false, min = 0, max = 9999 } = {}) {
@@ -121,6 +136,7 @@ export function historiqueExercice(journal, exerciceId, nom = '') {
         debut: entree.debut,
         series: faites.map(({ charge, reps }) => ({ charge, reps })),
         meilleure: charges.length ? Math.max(...charges) : null,
+        unite: ex.unite || 'reps',
       });
     }
   }
@@ -131,8 +147,12 @@ export function historiqueExercice(journal, exerciceId, nom = '') {
  * Prépare une nouvelle séance à partir du programme.
  * Chaque série est pré-remplie avec ce qui a été fait la dernière fois
  * (même numéro de série), sinon avec la cible du programme.
+ *
+ * Progression double : si, la dernière fois, toutes les séries prévues ont atteint
+ * les répétitions visées avec une charge, la charge proposée augmente de PAS_CHARGE.
+ * Semaine allégée : une série de moins (à partir de 3), même charge, pas d'augmentation.
  */
-export function preparerSeance(seance, journal) {
+export function preparerSeance(seance, journal, { allegee = false } = {}) {
   return {
     id: nouvelId(),
     date: cleJour(),
@@ -142,21 +162,33 @@ export function preparerSeance(seance, journal) {
     fin: null,
     courant: 0,
     reposFin: null,
+    allegee,
     exercices: seance.exercices.map((ex, i) => {
+      const u = ex.unite || 'reps';
       const dernier = historiqueExercice(journal, ex.id, ex.nom).pop();
-      const nb = Math.max(1, ex.series || 1);
+      const prevues = Math.max(1, ex.series || 1);
+      const nb = allegee && u !== 'min' && prevues >= 3 ? prevues - 1 : prevues;
+
+      const progression = !allegee && u === 'reps' && Boolean(dernier) && dernier.meilleure !== null
+        && Boolean(ex.reps) && dernier.series.length >= prevues
+        && dernier.series.every((s) => s.reps >= ex.reps);
+
       const series = Array.from({ length: nb }, (_, n) => {
         const ref = dernier ? dernier.series[Math.min(n, dernier.series.length - 1)] : null;
         return {
-          charge: ref ? ref.charge : ex.charge,
-          reps: ref ? ref.reps : (ex.reps || 10),
+          charge: progression ? dernier.meilleure + PAS_CHARGE : (ref ? ref.charge : ex.charge),
+          // Après une progression, on vise à nouveau les répétitions du programme.
+          reps: progression ? ex.reps : (ref ? ref.reps : (ex.reps || 10)),
           fait: false,
         };
       });
       return {
         exerciceId: ex.id,
         nom: ex.nom || `Exercice ${i + 1}`,
-        repos: ex.repos || REPOS_DEFAUT,
+        repos: ex.repos ?? REPOS_DEFAUT,
+        unite: u,
+        consigne: ex.consigne || '',
+        progression,
         cible: { series: nb, reps: ex.reps, charge: ex.charge },
         series,
       };

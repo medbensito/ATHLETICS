@@ -133,6 +133,28 @@ Document tenu à jour à chaque jalon : choix faits, et points à vérifier sur 
 - [ ] **Import** : « Importer une sauvegarde » ouvre le sélecteur de Fichiers ; l'aperçu s'affiche ; après confirmation, les données sont restaurées.
 - [ ] Test complet conseillé : exporter, supprimer l'icône de l'écran d'accueil, réinstaller, importer, vérifier que tout est revenu.
 
+## Choix techniques (1.1 — programme sur-mesure)
+
+| Sujet | Choix | Raison |
+|---|---|---|
+| Contenu | `js/plan.js`, source unique ; `PROGRAMME.md` en est généré | Une seule définition, impossible de désynchroniser l'app et le document. |
+| Structure | 3 phases (4, 8 et 14 semaines), 3 séances de musculation + 2 de cardio | Départ très sédentaire : d'abord la technique et l'habitude, puis le volume, puis l'intensité. Le cardio en zone 2 vise la graisse abdominale ; les intervalles n'arrivent qu'en phase 2. |
+| Stockage | Réglage `plan` (date de début = un lundi, phase) ; les séances de la phase sont écrites dans `seances` | Aucune nouvelle table : le programme reste éditable comme n'importe quel autre, et l'export / import le couvre. |
+| Passage de phase | Proposé, jamais automatique, avec confirmation | Garder la main, notamment si la phase actuelle a été modifiée. |
+| Continuité | L'historique se retrouve par nom d'exercice d'une phase à l'autre | Les charges suivent quand un exercice revient (tirage vertical, leg curl…). |
+| Progression | Double progression : toutes les séries prévues aux répétitions visées → + 2,5 kg proposés, répétitions remises à l'objectif | Simple, éprouvée, et automatique : un seul appui dans le cas courant. |
+| Semaine allégée | Une série de moins pour les exercices de 3 séries ou plus, sans progression ; le cardio n'est pas allégé | Récupération planifiée ; le cardio en zone 2 ne fatigue pas assez pour justifier une baisse. |
+| Unités | `reps`, `s`, `min` par exercice ; pas des boutons 1, 5 et 1 ; charge masquée pour les minutes | Gainage et cardio se saisissent naturellement. |
+| Intervalles | Séries de 1 minute, le repos du chronomètre sert de phase lente | Réutilise le chronomètre existant. |
+| Robustesse | Liste des séances : gestionnaires posés une seule fois, verrou contre le double appui, une seule séance en cours possible | Corrige un défaut présent depuis le J3 : après un rechargement de la liste, « Démarrer » pouvait créer deux séances. |
+
+## Points à vérifier sur iPhone (1.1)
+
+- [ ] Réglages affiche 1.1.0 ; adopter le programme sur-mesure remplace bien les séances, l'historique reste.
+- [ ] En séance : consigne lisible, libellés Secondes / Minutes, pas de champ charge pour le cardio.
+- [ ] Deuxième passage d'un exercice réussi : la charge + 2,5 kg est proposée.
+- [ ] Le sélecteur d'unité de l'éditeur ouvre la roue iOS.
+
 ## Récapitulatif : ce qui ne peut être vérifié que sur un vrai iPhone
 
 - Installation, plein écran, encoche et barre d'accueil (J1).

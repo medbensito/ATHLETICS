@@ -73,7 +73,7 @@ export async function monter(racine, params, entete) {
       <ul class="etat">
         ${passages.map((p, i) => `
           <li class="etat__ligne etat__ligne--libre">
-            <span class="etat__libelle">${echapper(dateCourte(p.date))}<br><small>${echapper(p.series.map(formatSerie).join(' · '))}</small></span>
+            <span class="etat__libelle">${echapper(dateCourte(p.date))}<br><small>${echapper(p.series.map((x) => formatSerie(x, p.unite)).join(' · '))}</small></span>
             <span class="etat__valeur">${echapper(ecart(i))}</span>
           </li>`).reverse().join('')}
       </ul>

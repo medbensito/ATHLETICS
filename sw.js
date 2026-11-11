@@ -14,7 +14,7 @@
  * et ne sont jamais touchées par ce fichier.
  */
 
-const VERSION = 'v1.4.0';
+const VERSION = 'v1.4.1';
 const CACHE = `athletics-${VERSION}`;
 
 // Chemins relatifs : l'app fonctionne aussi dans un sous-dossier (ex. GitHub Pages).

@@ -3,7 +3,7 @@
 Application web progressive (PWA) personnelle de suivi de transformation physique.
 Tout reste sur l'appareil : pas de serveur, pas de compte, pas de service tiers.
 
-**Version 1.4.0** — check-in quotidien et séance du jour, programme sur-mesure de 6 mois (Push / Pull / Legs / Upper / Lower) et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire et calendrier, records, rappels, sauvegarde et restauration JSON.
+**Version 1.4.1** — check-in quotidien et séance du jour, programme sur-mesure de 6 mois (Push / Pull / Legs / Upper / Lower) et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire et calendrier, records, rappels, sauvegarde et restauration JSON.
 
 App en ligne : <https://medbensito.github.io/ATHLETICS/> (dépôt `medbensito/ATHLETICS`, GitHub Pages sur la branche `main`).
 
@@ -96,6 +96,8 @@ ATHLETICS/
 - Si l'app est fermée en pleine séance, elle reprend où elle en était (carte « Séance en cours »).
 
 **Historique** : lien « Historique » dans le mode séance ou dans l'éditeur — dernière charge, meilleure charge, max estimé et détail séance par séance avec l'écart d'une fois sur l'autre.
+
+**Dernières séances** (onglet Séances) : les 10 dernières séances terminées. **Supprimer** retire définitivement une séance enregistrée par erreur, après confirmation ; l'historique, les records et le bilan sont recalculés, et la case « Séance : faite » du check-in est décochée s'il ne reste aucune autre séance ce jour-là.
 
 **Records** (onglet Séances, en bas) : meilleure charge et max estimé de chaque exercice. Le max estimé est la charge théorique sur une répétition, calculée d'après tes séries (formule d'Epley, jusqu'à 12 répétitions) : une estimation, pas un test à faire. En fin de séance, les nouveaux records sont annoncés.
 

@@ -102,10 +102,11 @@ async function liste(racine, entete) {
         <section class="carte">
           <h2 class="carte__titre">Dernières séances</h2>
           <ul class="etat">
-            ${terminees.slice(0, 5).map((j) => `
-              <li class="etat__ligne etat__ligne--libre">
-                <span class="etat__libelle">${echapper(j.nomSeance)}<br><small>${echapper(nomJour(j.date))}</small></span>
-                <span class="etat__valeur">${compterSeries(j)} séries · ${dureeMinutes(j)} min</span>
+            ${terminees.slice(0, 10).map((j) => `
+              <li class="etat__ligne etat__ligne--libre etat__ligne--3">
+                <span class="etat__libelle">${echapper(j.nomSeance)}<br><small>${echapper(nomJour(j.date))} · ${compterSeries(j)} séries · ${dureeMinutes(j)} min</small></span>
+                <span></span>
+                <button type="button" class="lien lien--discret" data-action="supprimer-faite" data-id="${j.id}" aria-label="Supprimer la séance ${echapper(j.nomSeance)} du ${echapper(nomJour(j.date).toLowerCase())}">Supprimer</button>
               </li>`).join('')}
           </ul>
         </section>` : ''}`;
@@ -143,6 +144,22 @@ async function liste(racine, entete) {
         if (!confirm(`Passer à la phase ${numero} ? Les séances du programme seront remplacées par celles de la phase ${numero} (tes modifications éventuelles de la phase actuelle seront perdues). L'historique est conservé.`)) return;
         await appliquerPhase(numero);
         await rendre(`Phase ${numero} en place.`);
+        return;
+      }
+      case 'supprimer-faite': {
+        // Séance enregistrée par erreur : suppression définitive après confirmation.
+        const entree = journal.find((j) => j.id === cible.dataset.id);
+        if (!entree) return;
+        if (!confirm(`Supprimer définitivement la séance « ${entree.nomSeance} » du ${nomJour(entree.date).toLowerCase()} ? Ses séries disparaîtront de l'historique, des records et du bilan. Cette action ne peut pas être annulée.`)) return;
+        await supprimer('journal', entree.id);
+        // Le check-in « Séance : faite » avait été coché automatiquement : on le retire
+        // s'il ne reste aucune autre séance terminée ce jour-là.
+        const autre = journal.some((j) => j.id !== entree.id && j.fin && j.date === entree.date);
+        const checkin = await lire('checkins', entree.date);
+        if (!autre && checkin && checkin.seance === 'faite') {
+          await ecrire('checkins', { ...checkin, seance: null, majLe: new Date().toISOString() });
+        }
+        await rendre('Séance supprimée.');
         return;
       }
       case 'ajouter': {

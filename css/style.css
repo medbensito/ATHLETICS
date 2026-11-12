@@ -336,6 +336,9 @@ li:first-child > .etat__ligne--bouton { border-top: 0; }
   text-decoration: none;
 }
 .lien--discret { color: var(--encre-douce); font-weight: 600; }
+
+/* Rappel de sauvegarde à l'accueil : export en un geste, report discret */
+.sauvegarde__actions { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; }
 .lien--icone { display: inline-flex; align-items: center; gap: 4px; }
 .lien--icone .ico, .bouton .ico { width: 20px; height: 20px; }
 .bouton:has(.ico) { display: flex; align-items: center; justify-content: center; gap: 6px; }
@@ -613,11 +616,18 @@ input[type="date"].saisie::-webkit-date-and-time-value { text-align: center; }
 .exo__consigne { color: var(--encre-douce); font-size: 15px; }
 .exo__serie { font-family: var(--police-chiffres); font-size: 28px; font-weight: 700; line-height: 1.1; }
 .exo__prevu { color: var(--encre); font-family: var(--police-chiffres); font-size: 22px; font-weight: 600; }
+/* Un champ qui prend le focus défile au-dessus du bouton collé et des onglets. */
+html:has(body[data-ecran="seances-en-cours"]) { scroll-padding-bottom: calc(var(--hauteur-onglets) + var(--sur-bas) + 96px); }
 .exo [data-action="valider"] {
   position: sticky;
   bottom: calc(var(--hauteur-onglets) + var(--sur-bas) + 10px);
   z-index: 1;
   box-shadow: 0 8px 20px rgba(22, 25, 30, 0.22);
+}
+/* Petits écrans (iPhone SE…) : bouton dans le flux, juste sous les répétitions,
+   pour ne jamais masquer un champ. */
+@media (max-height: 740px) {
+  .exo [data-action="valider"] { position: static; box-shadow: none; }
 }
 /* Exercice terminé dans la liste : rayé au feutre */
 .etat__ligne--fait .etat__libelle { position: relative; justify-self: start; color: var(--encre-douce); }
@@ -701,19 +711,34 @@ input[type="date"].saisie::-webkit-date-and-time-value { text-align: center; }
 .nombre__champ::placeholder { color: var(--encre-pale); }
 
 /* Chronomètre de repos */
-.chrono { gap: 4px; text-align: center; box-shadow: inset 0 0 0 2px var(--encre); }
-.chrono__libelle { color: var(--encre-douce); font-size: 16px; font-weight: 600; }
+/* Chrono de repos compact : temps à gauche, actions à droite, sur une seule bande.
+   Il prend ~100 px au lieu de ~190 : les champs charge et répétitions restent
+   visibles au-dessus du bouton « Série faite » collé en bas. */
+.chrono {
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "libelle actions" "temps actions";
+  align-items: center;
+  column-gap: 16px;
+  row-gap: 0;
+  padding: 12px 14px;
+  box-shadow: inset 0 0 0 2px var(--encre);
+}
+.chrono__libelle { grid-area: libelle; color: var(--encre-douce); font-size: 15px; font-weight: 600; line-height: 1.2; }
 .chrono__temps {
+  grid-area: temps;
   font-family: var(--police-chiffres);
-  font-size: 64px;
+  font-size: 52px;
   font-weight: 700;
   line-height: 0.95;
   letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  min-width: 3.1ch;
 }
-.chrono__actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+.chrono__actions { grid-area: actions; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.chrono__actions .choix__option { min-height: 48px; padding-inline: 4px; }
 .chrono--fini { background: var(--bleu); color: #fff; box-shadow: none; }
 .chrono--fini .chrono__libelle { color: rgba(255, 255, 255, 0.88); }
-.chrono--fini .chrono__temps { font-size: 36px; padding: 4px 0; }
+.chrono--fini .chrono__temps { font-size: 34px; padding: 4px 0; }
 .chrono--fini .choix__option { background: rgba(255, 255, 255, 0.16); color: #fff; }
 
 /* Remplacement d'exercice */

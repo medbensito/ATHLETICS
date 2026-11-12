@@ -230,6 +230,22 @@ Document tenu à jour à chaque jalon : choix faits, et points à vérifier sur 
 - [ ] En séance, le bouton « Série faite » reste accessible au pouce sans masquer le chrono.
 - [ ] L'icône de l'écran d'accueil est la nouvelle (il peut falloir supprimer puis réinstaller l'app — exporter d'abord ses données).
 
+## Choix techniques (2.1 — chrono compact et sauvegarde depuis l'accueil)
+
+| Sujet | Choix | Raison |
+|---|---|---|
+| Chrono de repos | Une seule bande (~100 px) : temps à gauche, −15 s / +15 s / Passer à droite | Le champ Répétitions reste visible au-dessus du bouton « Série faite » pendant le repos. |
+| Petits écrans | Hauteur ≤ 740 px (iPhone SE) : « Série faite » reste dans le flux, sous les répétitions | Un bouton collé masquerait un champ sur un écran court. |
+| Focus | `scroll-padding-bottom` en séance | Un champ touché défile au-dessus du bouton et des onglets. |
+| Rappel de sauvegarde | À l'accueil dès 3 check-ins ou séances, si le dernier export date de 7 jours ou plus ; bouton « Exporter maintenant » | Les données ne vivent que sur le téléphone : l'export doit être à un geste. |
+| Export depuis l'accueil | Fichier préparé dès l'appui (`pointerdown`), feuille de partage ouverte au clic | Safari n'ouvre la feuille de partage que juste après le geste. |
+| « Plus tard » | Masque le rappel 3 jours (réglage `sauvegardeReportee`) | Rappeler sans insister. |
+
+## Points à vérifier sur iPhone (2.1)
+
+- [ ] Pendant le repos, le chrono, la charge, les répétitions et « Série faite » tiennent sur un écran.
+- [ ] « Exporter maintenant » à l'accueil ouvre la feuille de partage ; « Enregistrer dans Fichiers » fait disparaître le rappel.
+
 ## Récapitulatif : ce qui ne peut être vérifié que sur un vrai iPhone
 
 - Installation, plein écran, encoche et barre d'accueil (J1).

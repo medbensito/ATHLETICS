@@ -23,10 +23,10 @@
  * « null » signifie « non renseigné », à ne pas confondre avec 0 ou « non ».
  */
 
-import { lire, lireTout, ecrire } from '../db.js';
+import { lire, lireTout, ecrire, lireReglage, ecrireReglage } from '../db.js';
 import { cleJour, estCleJour, decalerJour, dateLongue, nomJour, dureeSommeil, formatDuree, depuisCle } from '../dates.js';
 import { echapper, carteInstallation } from '../ui.js';
-import { joursDepuisExport, formatAnciennete } from '../sauvegarde.js';
+import { joursDepuisExport, formatAnciennete, preparerExport, remettreExport } from '../sauvegarde.js';
 import { carteRappelMesure } from './corps.js';
 import { lireRappels, rappelCheckinActif, rappelSeanceActif } from '../rappels.js';
 import { lirePlan, estSemaineAllegee } from '../plan.js';
@@ -288,6 +288,12 @@ export async function monter(racine, params, entete) {
 
   // --- Gestes ---
 
+  // Export préparé au début de l'appui, prêt quand le clic arrive.
+  let exportEnPreparation = null;
+  racine.addEventListener('pointerdown', (evt) => {
+    if (evt.target.closest('[data-action="exporter-accueil"]')) exportEnPreparation = preparerExport();
+  });
+
   racine.addEventListener('click', async (evt) => {
     const cible = evt.target.closest('button');
     if (!cible) return;
@@ -307,6 +313,24 @@ export async function monter(racine, params, entete) {
       const actuel = checkin[champ];
       const suivant = actuel === null ? (pas > 0 ? 1 : 0) : Math.min(LIMITES[champ], Math.max(0, actuel + pas));
       modifier({ [champ]: suivant });
+      return;
+    }
+
+    // Sauvegarde depuis l'accueil. L'export est préparé dès l'appui (pointerdown) :
+    // Safari n'ouvre la feuille de partage que juste après le geste.
+    if (cible.dataset.action === 'exporter-accueil') {
+      const carte = cible.closest('[data-role="sauvegarde"]');
+      const pret = await (exportEnPreparation || preparerExport());
+      exportEnPreparation = null;
+      const resultat = await remettreExport(pret);
+      if (resultat === 'annule') return; // feuille refermée : la carte reste
+      carte.classList.remove('carte--rappel');
+      carte.innerHTML = `<p class="carte__texte" role="status">Sauvegarde faite${resultat === 'telechargement' ? ` : ${echapper(pret.nom)}` : ''}. Prochain rappel dans ${DELAI_SAUVEGARDE} jours.</p>`;
+      return;
+    }
+    if (cible.dataset.action === 'reporter-sauvegarde') {
+      await ecrireReglage('sauvegardeReportee', decalerJour(cleJour(), DELAI_REPORT));
+      cible.closest('[data-role="sauvegarde"]').remove();
       return;
     }
 
@@ -371,14 +395,41 @@ function semaineEnBref(date, checkins, journal, seances, plan) {
   return `<ol class="semaine" aria-label="Cette semaine">${jours}</ol>`;
 }
 
-/** Rappel discret de sauvegarde, seulement quand il y a de quoi sauvegarder. */
+// ---------- Rappel de sauvegarde ----------
+
+/** Nombre de jours après lequel l'accueil propose une sauvegarde. */
+export const DELAI_SAUVEGARDE = 7;
+/** « Plus tard » repousse le rappel de ce nombre de jours. */
+const DELAI_REPORT = 3;
+
+/**
+ * Rappel de sauvegarde, avec export en un geste depuis l'accueil.
+ * Affiché seulement s'il y a de quoi sauvegarder (au moins 3 check-ins ou séances)
+ * et si le dernier export date de 7 jours ou plus (ou n'a jamais eu lieu).
+ * « Plus tard » le masque 3 jours (réglage « sauvegardeReportee »).
+ */
 async function carteSauvegarde(nbCheckins) {
-  if (nbCheckins < 3) return '';
+  const journal = await lireTout('journal');
+  const nbSeances = journal.filter((j) => j.fin).length;
+  if (nbCheckins + nbSeances < 3) return '';
+
   const jours = await joursDepuisExport();
-  if (jours !== null && jours < 7) return '';
+  if (jours !== null && jours < DELAI_SAUVEGARDE) return '';
+  const reportee = await lireReglage('sauvegardeReportee');
+  if (reportee && reportee > cleJour()) return '';
+
+  const contenu = [
+    nbCheckins ? `${nbCheckins} check-in${nbCheckins > 1 ? 's' : ''}` : '',
+    nbSeances ? `${nbSeances} séance${nbSeances > 1 ? 's' : ''}` : '',
+  ].filter(Boolean).join(' et ');
+
   return `
-    <a class="carte carte--lien" href="#/reglages">
-      <span class="carte__titre">Penser à la sauvegarde</span>
-      <span class="carte__texte">Dernier export : ${echapper(formatAnciennete(jours))}. Un fichier JSON met tes ${nbCheckins} check-ins à l'abri.</span>
-    </a>`;
+    <section class="carte carte--rappel sauvegarde" data-role="sauvegarde">
+      <h2 class="carte__titre">Sauvegarder mes données</h2>
+      <p class="carte__texte">Dernier export : ${echapper(formatAnciennete(jours))}. Tes ${contenu} ne sont que sur ce téléphone ; un fichier JSON dans Fichiers ou iCloud les met à l'abri.</p>
+      <div class="sauvegarde__actions">
+        <button type="button" class="bouton" data-action="exporter-accueil">Exporter maintenant</button>
+        <button type="button" class="lien lien--discret" data-action="reporter-sauvegarde">Plus tard</button>
+      </div>
+    </section>`;
 }

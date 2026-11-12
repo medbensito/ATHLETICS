@@ -3,7 +3,7 @@
 Application web progressive (PWA) personnelle de suivi de transformation physique.
 Tout reste sur l'appareil : pas de serveur, pas de compte, pas de service tiers.
 
-**Version 2.0.0** (refonte « tableau blanc ») — check-in quotidien et séance du jour, programme sur-mesure de 6 mois (Push / Pull / Legs / Upper / Lower) et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire et calendrier, records, rappels, sauvegarde et restauration JSON.
+**Version 2.1.0** — check-in quotidien et séance du jour, programme sur-mesure de 6 mois (Push / Pull / Legs / Upper / Lower) et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire et calendrier, records, rappels, sauvegarde et restauration JSON.
 
 App en ligne : <https://medbensito.github.io/ATHLETICS/> (dépôt `medbensito/ATHLETICS`, GitHub Pages sur la branche `main`).
 
@@ -180,7 +180,7 @@ Toujours utiliser l'app depuis l'icône. L'app installée et l'onglet Safari ont
 
 - **Exporter** : Réglages → **Exporter mes données**. Sur iPhone, la feuille de partage s'ouvre : choisir **Enregistrer dans Fichiers** (iCloud Drive de préférence). Sur ordinateur, le fichier est téléchargé.
 - Le fichier s'appelle `athletics-sauvegarde-AAAA-MM-JJ.json` et contient toutes les données (check-ins, programme, séances, mesures, réglages).
-- L'app rappelle discrètement de sauvegarder quand le dernier export date de plus de 7 jours.
+- Quand le dernier export date de 7 jours ou plus, l'écran Aujourd'hui affiche une carte **Sauvegarder mes données** : **Exporter maintenant** ouvre directement la feuille de partage, **Plus tard** la masque 3 jours.
 - **Importer** : Réglages → **Importer une sauvegarde**, choisir le fichier. L'app affiche d'abord son contenu ; rien n'est modifié tant que **Remplacer par cette sauvegarde** n'est pas confirmé. L'import **remplace toutes** les données actuelles : exporter d'abord pour les garder. Un fichier abîmé ou étranger est refusé sans rien toucher.
 - Changer de téléphone : exporter sur l'ancien, installer l'app sur le nouveau, importer.
 - Rythme conseillé : un export par semaine, enregistré dans Fichiers / iCloud Drive.
@@ -225,3 +225,4 @@ Les mises à jour ne touchent jamais les données saisies.
 - [x] **1.3** — séance du jour à l'accueil, remplacement d'exercice en séance
 - [x] **1.4** — calendrier de régularité, records et max estimé
 - [x] **2.0** — refonte visuelle « tableau blanc de salle » : thème clair, polices Barlow embarquées, icônes dessinées, bande de la semaine à l'accueil
+- [x] **2.1** — chrono de repos compact (les champs restent visibles), sauvegarde en un geste depuis l'accueil

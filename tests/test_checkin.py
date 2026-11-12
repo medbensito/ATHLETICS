@@ -92,7 +92,7 @@ with sync_playwright() as p:
     # Futur refusé
     page.goto(URL + "#/aujourdhui/2099-01-01")
     page.wait_for_timeout(300)
-    verifier("date future ramenée à aujourd'hui", page.locator("#titre-ecran").inner_text() == "Aujourd'hui")
+    verifier("date future ramenée à aujourd'hui", page.locator("#titre-ecran").text_content() == "Aujourd'hui")
 
     # Proposition « comme la dernière fois » : visible sur un jour sans heures quand un jour antérieur en a
     page.evaluate("""async () => {

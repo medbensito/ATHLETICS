@@ -32,6 +32,7 @@ import { lireRappels, rappelCheckinActif, rappelSeanceActif } from '../rappels.j
 import { lirePlan, estSemaineAllegee } from '../plan.js';
 import { seanceDuJour, joursConnus, demarrerSeance, NOMS_JOURS_LONGS } from '../seance-du-jour.js';
 import { ICONES } from '../icones.js';
+import { pisteTransformation } from '../piste.js';
 
 const LIMITES = { repas: 10, cigarettes: 99 };
 
@@ -75,7 +76,7 @@ function compteur(champ, libelle, grand = false) {
 
 function rubrique(id, titre, contenu, sousTitre = '') {
   return `
-    <section class="carte rubrique" data-rubrique="${id}">
+    <section class="carte rubrique" data-rubrique="${id}" id="rubrique-${id}" tabindex="-1">
       <header class="rubrique__entete">
         <h2 class="carte__titre">${echapper(titre)}${sousTitre ? ` <span class="rubrique__sous-titre">${echapper(sousTitre)}</span>` : ''}</h2>
         <span class="rubrique__coche" aria-hidden="true"></span>
@@ -92,6 +93,11 @@ function gabarit(date, estAujourdhui, habitude) {
       ${estAujourdhui
         ? `<span class="jours__fleche jours__fleche--inactive" aria-hidden="true">${ICONES.droite}</span>`
         : `<a class="jours__fleche" href="#/aujourdhui/${decalerJour(date, 1)}" aria-label="Jour suivant">${ICONES.droite}</a>`}
+    </div>
+
+    <div class="tuiles" role="group" aria-label="Rubriques du check-in">
+      ${[['seance', 'Séance'], ['sommeil', 'Sommeil'], ['alimentation', 'Alimentation'], ['cigarettes', 'Cigarettes']].map(([id, titre]) => `
+        <button type="button" class="tuile" data-aller="${id}">${titre}<span class="tuile__etat" data-etat-tuile="${id}" role="img" aria-label="à noter"></span></button>`).join('')}
     </div>
 
     ${rubrique('seance', 'Séance',
@@ -176,31 +182,41 @@ export async function monter(racine, params, entete) {
     const prevue = seanceDuJour(seances, plan, date);
     let cartes = '';
 
+    /** Nom court affiché en très grand : « Push » pour « Push · poussée ». */
+    const court = (nom) => String(nom).split(' · ')[0];
+    const titreGeant = (nom) => {
+      const c = court(nom);
+      return `<h2 class="seance-jour__titre ${c.length > 9 ? 'seance-jour__titre--long' : ''}" aria-label="${echapper(nom)}">${echapper(c)}</h2>`;
+    };
+
     if (enCours) {
       // Une séance commencée passe avant tout le reste.
       cartes += `
         <section class="carte carte--accent seance-jour">
-          <h2 class="seance__nom">${echapper(enCours.nomSeance)}</h2>
-          <p class="meta">Séance en cours</p>
-          <a class="bouton" href="#/seances/en-cours">Reprendre</a>
+          <p class="etiquette">Séance en cours</p>
+          ${titreGeant(enCours.nomSeance)}
+          <p class="meta">${echapper(enCours.nomSeance)}</p>
+          <a class="bouton bouton--lancer" href="#/seances/en-cours">Reprendre<span class="bouton__icone" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z"/></svg></span></a>
         </section>`;
     } else if (prevue && !faiteAujourdhui) {
       // Séance prévue aujourd'hui : un appui pour démarrer. Masquée dès que la rubrique Séance est remplie.
       const nb = prevue.exercices.length;
+      const description = prevue.description ? prevue.description.replace(/^[^·]*·\s*/, '').replace(/\.$/, '') : '';
       cartes += `
         <section class="carte carte--accent seance-jour" data-rappel="seance">
-          <h2 class="seance__nom">${echapper(prevue.nom)}</h2>
-          <p class="meta">${NOMS_JOURS_LONGS[depuisCle(date).getDay()]} · séance du jour${estSemaineAllegee(plan) ? ' · semaine allégée' : ''}</p>
-          ${prevue.description ? `<p class="carte__texte">${echapper(prevue.description.replace(/^[^·]*·\s*/, ''))}</p>` : ''}
-          ${nb ? `<button type="button" class="bouton" data-action="demarrer-seance" data-id="${prevue.id}">Démarrer · ${nb} exercice${nb > 1 ? 's' : ''}</button>`
+          <p class="etiquette">Ce soir${estSemaineAllegee(plan) ? ' · semaine allégée' : ''}</p>
+          ${titreGeant(prevue.nom)}
+          <p class="meta">${echapper(prevue.nom)} · ${nb} exercice${nb > 1 ? 's' : ''}</p>
+          ${description ? `<p class="carte__texte">${echapper(description)}.</p>` : ''}
+          ${nb ? `<button type="button" class="bouton bouton--lancer" data-action="demarrer-seance" data-id="${prevue.id}">Démarrer la séance<span class="bouton__icone" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z"/></svg></span></button>`
             : `<a class="bouton bouton--secondaire" href="#/seances/modifier/${prevue.id}">Ajouter des exercices</a>`}
-          <p class="carte__note">Imprévu ou fatigue : coche simplement « Repos » plus bas.</p>
+          <p class="carte__note">Imprévu ou fatigue : coche simplement « Repos » dans le check-in.</p>
         </section>`;
     } else if (!prevue && !faiteAujourdhui && joursConnus(seances, plan)) {
       cartes += `
         <section class="carte seance-jour" data-rappel="seance">
-          <h2 class="seance__nom">Jour de repos</h2>
-          <p class="meta">${NOMS_JOURS_LONGS[depuisCle(date).getDay()]} · jour de repos</p>
+          <p class="etiquette etiquette--douce">${NOMS_JOURS_LONGS[depuisCle(date).getDay()]} · jour de repos</p>
+          <h2 class="seance-jour__titre" aria-label="Jour de repos">Repos</h2>
           <p class="carte__texte">Pas de séance prévue. Une marche de 30 à 45 minutes, si tu en as envie : elle aide la perte de graisse sans gêner la récupération.</p>
         </section>`;
     }
@@ -219,8 +235,10 @@ export async function monter(racine, params, entete) {
           <span class="carte__texte">Quelques touches suffisent, rien n'est obligatoire.</span>
         </div>`;
     }
-    // La semaine en un coup d'œil : chaque jour fait est coché d'un trait de feutre.
+    // La semaine en un coup d'œil : chaque jour fait est coché en menthe.
     if (joursConnus(seances, plan) || journal.some((j) => j.fin)) cartes += semaineEnBref(date, tous, journal, seances, plan);
+    // La piste des 26 semaines ouvre l'écran, au-dessus de la séance du soir.
+    cartes = pisteTransformation(plan, date) + cartes;
     if (cartes) $('.jours').insertAdjacentHTML('beforebegin', cartes);
   }
 
@@ -256,6 +274,9 @@ export async function monter(racine, params, entete) {
       const ok = estRemplie(checkin);
       if (ok) remplies += 1;
       $(`[data-rubrique="${id}"]`).classList.toggle('rubrique--remplie', ok);
+      const tuile = $(`[data-aller="${id}"]`);
+      tuile.classList.toggle('tuile--remplie', ok);
+      $(`[data-etat-tuile="${id}"]`).setAttribute('aria-label', ok ? 'rempli' : 'à noter');
     }
     const total = Object.keys(RUBRIQUES).length;
     // Les rappels disparaissent dès que la rubrique concernée est remplie.
@@ -297,6 +318,14 @@ export async function monter(racine, params, entete) {
   racine.addEventListener('click', async (evt) => {
     const cible = evt.target.closest('button');
     if (!cible) return;
+
+    // Tuile du check-in : défile jusqu'à la rubrique.
+    if (cible.dataset.aller) {
+      const rubrique = $(`#rubrique-${cible.dataset.aller}`);
+      rubrique.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+      rubrique.focus({ preventScroll: true });
+      return;
+    }
 
     // Bouton de choix : un second appui retire la sélection.
     if (cible.dataset.valeur !== undefined) {
@@ -375,21 +404,26 @@ export async function monter(racine, params, entete) {
 }
 
 /** Bande des 7 jours de la semaine (lundi → dimanche) : séance faite, repos, prévue, aujourd'hui. */
-function semaineEnBref(date, checkins, journal, seances, plan) {
+export function semaineEnBref(date, checkins, journal, seances, plan) {
   const lundi = decalerJour(date, -((depuisCle(date).getDay() + 6) % 7));
   const parDate = new Map(checkins.map((c) => [c.date, c]));
   const faits = new Set(journal.filter((j) => j.fin).map((j) => j.date));
   checkins.forEach((c) => { if (c.seance === 'faite') faits.add(c.date); });
   const lettres = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+  const coche = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
   const jours = lettres.map((lettre, i) => {
     const cle = decalerJour(lundi, i);
-    let etat = '';
-    let libelle = 'rien de noté';
-    if (faits.has(cle)) { etat = 'fait'; libelle = 'séance faite'; } else if (parDate.get(cle)?.seance === 'repos') { etat = 'repos'; libelle = 'repos'; } else if (cle >= date && seanceDuJour(seances, plan, cle)) { etat = 'prevu'; libelle = 'séance prévue'; }
+    const prevue = seanceDuJour(seances, plan, cle);
+    const nomCourt = prevue ? String(prevue.nom).split(' · ')[0].toLowerCase() : '';
+    let etat = 'libre';
+    let marque = 'repos';
+    let libelle = prevue ? `${prevue.nom} prévue` : 'jour de repos';
+    if (faits.has(cle)) { etat = 'fait'; marque = coche; libelle = 'séance faite'; } else if (parDate.get(cle)?.seance === 'repos') { etat = 'repos'; marque = 'repos'; libelle = 'repos'; } else if (prevue) { etat = cle >= date ? 'prevu' : 'manque'; marque = echapper(nomCourt); }
     return `
-      <li class="semaine__jour ${etat ? `semaine__jour--${etat}` : ''} ${cle === date ? 'semaine__jour--aujourdhui' : ''}">
+      <li class="semaine__jour semaine__jour--${etat} ${cle === date ? 'semaine__jour--aujourdhui' : ''}">
         <span class="semaine__lettre" aria-hidden="true">${lettre}</span>
-        <span class="semaine__marque" role="img" aria-label="${NOMS_JOURS_LONGS[depuisCle(cle).getDay()]} : ${libelle}"></span>
+        <span class="semaine__numero" aria-hidden="true">${depuisCle(cle).getDate()}</span>
+        <span class="semaine__marque" role="img" aria-label="${NOMS_JOURS_LONGS[depuisCle(cle).getDay()]} : ${echapper(libelle)}">${marque}</span>
       </li>`;
   }).join('');
   return `<ol class="semaine" aria-label="Cette semaine">${jours}</ol>`;

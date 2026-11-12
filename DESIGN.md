@@ -1,206 +1,137 @@
 ---
 name: Athletics
-description: Le tableau blanc de la salle, où la séance du jour s'écrit et se raye à mesure qu'elle se fait.
+description: Une salle le soir, un projecteur sur ce qui compte maintenant.
 colors:
-  planche: "#ffffff"
-  carte: "#ffffff"
-  plateau: "#edefea"
-  plateau-fort: "#dfe2dc"
-  trait: "#d8dbd4"
-  cadre: "#16191e"
-  encre: "#16191e"
-  encre-douce: "#545a64"
-  encre-pale: "#5f656f"
-  bleu: "#1d4ed8"
-  bleu-fonce: "#173fae"
-  bleu-pale: "#e6ecfb"
-  vert: "#0f7a43"
-  vert-pale: "#e2f2e9"
-  rouge: "#c81e3a"
-  ambre: "#a3530a"
+  fond: "#0f1115"
+  carte: "#181b21"
+  plateau: "#20242b"
+  plateau-fort: "#2a2f38"
+  trait: "#2c313a"
+  vide: "#3a404a"
+  encre: "#f2f1ee"
+  encre-douce: "#a7adb6"
+  encre-pale: "#8e959f"
+  braise: "#ff6b2c"
+  braise-texte: "#ff8a57"
+  braise-fond: "#2c1d16"
+  menthe: "#3ddc97"
+  menthe-fond: "#15291f"
+  craie: "#f2f1ee"
+  sur-couleur: "#0f1115"
+  rouge: "#ff6b7a"
 typography:
   titre-ecran:
-    fontFamily: "Barlow Condensed, Barlow, -apple-system, sans-serif"
-    fontSize: "38px"
-    fontWeight: 700
-    lineHeight: 1.02
-    letterSpacing: "-0.01em"
-  titre-bloc:
-    fontFamily: "Barlow Condensed, Barlow, -apple-system, sans-serif"
-    fontSize: "28px"
-    fontWeight: 700
-    lineHeight: 1.05
-  chiffre-geant:
-    fontFamily: "Barlow Condensed, Barlow, -apple-system, sans-serif"
-    fontSize: "84px"
-    fontWeight: 700
+    fontFamily: "Big Shoulders Display, Inter Tight, -apple-system, sans-serif"
+    fontSize: "40px"
+    fontWeight: 800
+    lineHeight: 0.95
+    textTransform: uppercase
+  titre-geant:
+    fontFamily: "Big Shoulders Display, Inter Tight, -apple-system, sans-serif"
+    fontSize: "88px"
+    fontWeight: 900
+    lineHeight: 0.84
+    textTransform: uppercase
+  chrono:
+    fontFamily: "Big Shoulders Display, Inter Tight, -apple-system, sans-serif"
+    fontSize: "80px"
+    fontWeight: 900
     lineHeight: 0.95
   chiffre-saisie:
-    fontFamily: "Barlow Condensed, Barlow, -apple-system, sans-serif"
+    fontFamily: "Big Shoulders Display, Inter Tight, -apple-system, sans-serif"
     fontSize: "40px"
-    fontWeight: 700
+    fontWeight: 800
     lineHeight: 1
   titre-carte:
-    fontFamily: "Barlow, -apple-system, sans-serif"
-    fontSize: "18px"
+    fontFamily: "Inter Tight, -apple-system, sans-serif"
+    fontSize: "20px"
     fontWeight: 700
-    lineHeight: 1.25
+    lineHeight: 1.2
   corps:
-    fontFamily: "Barlow, -apple-system, sans-serif"
+    fontFamily: "Inter Tight, -apple-system, sans-serif"
     fontSize: "17px"
     fontWeight: 400
     lineHeight: 1.45
-  libelle:
-    fontFamily: "Barlow, -apple-system, sans-serif"
-    fontSize: "15px"
-    fontWeight: 600
-    lineHeight: 1.3
+  etiquette:
+    fontFamily: "Inter Tight, -apple-system, sans-serif"
+    fontSize: "12px"
+    fontWeight: 700
+    letterSpacing: "0.14em"
+    textTransform: uppercase
 rounded:
-  petit: "8px"
-  carte: "10px"
+  petit: "12px"
+  moyen: "16px"
+  carte: "20px"
+  bouton: "18px"
   pilule: "999px"
 spacing:
-  gouttiere: "18px"
-  entre-cartes: "12px"
-  dans-carte: "18px"
+  gouttiere: "20px"
+  entre-cartes: "16px"
   tap: "52px"
 components:
-  bouton-principal:
-    backgroundColor: "{colors.bleu}"
-    textColor: "{colors.carte}"
-    rounded: "{rounded.petit}"
+  bouton-action:
+    backgroundColor: "{colors.braise}"
+    textColor: "{colors.sur-couleur}"
+    rounded: "{rounded.bouton}"
     height: "56px"
-    padding: "0 20px"
-  bouton-principal-appuye:
-    backgroundColor: "{colors.bleu-fonce}"
   bouton-secondaire:
     backgroundColor: "{colors.plateau}"
     textColor: "{colors.encre}"
-    rounded: "{rounded.petit}"
-    height: "56px"
+    rounded: "{rounded.bouton}"
+  bouton-clair:
+    backgroundColor: "{colors.craie}"
+    textColor: "{colors.sur-couleur}"
+    rounded: "{rounded.bouton}"
   option-choix:
     backgroundColor: "{colors.plateau}"
     textColor: "{colors.encre}"
     rounded: "{rounded.petit}"
-    height: "52px"
   option-choix-selectionnee:
-    backgroundColor: "{colors.encre}"
-    textColor: "{colors.carte}"
+    backgroundColor: "{colors.craie}"
+    textColor: "{colors.sur-couleur}"
   carte:
     backgroundColor: "{colors.carte}"
     rounded: "{rounded.carte}"
-    padding: "18px"
-  carte-action:
-    backgroundColor: "{colors.bleu}"
-    textColor: "{colors.carte}"
-    rounded: "{rounded.carte}"
-    padding: "18px"
-  champ:
-    backgroundColor: "{colors.plateau}"
-    textColor: "{colors.encre}"
-    rounded: "{rounded.petit}"
-    height: "52px"
-  barre-onglets:
-    backgroundColor: "{colors.cadre}"
-    textColor: "#a3a9b2"
-    height: "62px"
+  onglets:
+    backgroundColor: "rgba(24, 27, 33, 0.92)"
+    rounded: "{rounded.pilule}"
 ---
 
-# Design System: Athletics
+# Athletics — système visuel « Projecteur »
 
-## Overview
+## Intention
 
-Athletics est le tableau blanc d'une salle de musculation : on y écrit la séance du jour, on raye chaque série faite, on coche les jours de la semaine. L'app est un outil de travail (mode Operate) utilisé entre deux séries, d'une main, sous l'éclairage de la salle : tout doit se lire d'un coup d'œil et se toucher du pouce. Le monde du tableau blanc ne fournit que la typographie, la palette, la densité et un geste signature ; la navigation et les commandes restent celles que tout utilisateur d'iPhone connaît.
+Mehdi utilise l'app surtout en salle, entre les séries, et le soir pour le check-in. L'écran doit se lire d'un coup d'œil, à bout de bras, dans une salle plus ou moins éclairée. Le fond est presque noir et éclairé par le haut, comme un projecteur posé sur ce qui compte maintenant : la séance du soir, le repos en cours, la série à faire.
 
-Ce que le système refuse : l'écran quasi noir avec un seul accent néon et des anneaux de progression, qui est l'uniforme de la catégorie (et l'ancienne version d'Athletics).
+## Couleurs : un rôle chacune
 
-## Colors
+- **Braise** (`#ff6b2c`) : l'action du moment. Démarrer, Série faite, repos en cours, semaine en cours, aujourd'hui. Texte foncé dessus (6,9:1). Utilisée comme texte : `#ff8a57`.
+- **Menthe** (`#3ddc97`) : ce qui est fait. Séances, séries, rubriques remplies, semaines passées. Texte foncé dessus.
+- **Craie** (`#f2f1ee`) : ce qui est sélectionné. Options choisies, onglet actif, bouton de retour neutre.
+- Le reste est en gris froids : fond `#0f1115`, cartes `#181b21`, champs `#20242b`, contours `#2c313a`.
+- Aucune couleur décorative. Pas de halo coloré : les ombres sont neutres.
 
-Stratégie restreinte, à la manière d'un tableau blanc : une planche claire et quatre encres de feutre, chacune avec un seul rôle.
+## Typographie
 
-### Primary
-- **Bleu feutre** (`#1d4ed8`) : actions, sélection, l'action du moment. Un aplat bleu signifie « c'est ce qu'il y a à faire maintenant » (séance du jour, message de la semaine).
+- **Big Shoulders Display** pour les titres d'écran, le nom de la séance du soir (88 px), le chrono (80 px) et tous les chiffres saisis. En capitales pour les titres.
+- **Inter Tight** pour le texte, les libellés et les boutons.
+- Étiquettes en petites capitales espacées (« Ce soir », « Nouveau record », « Repos »).
 
-### Secondary
-- **Vert feutre** (`#0f7a43`) : ce qui est fait (séries rayées, rubriques cochées, jours avec séance, barres de régularité). Jamais pour décorer.
+## Signatures
 
-### Tertiary
-- **Rouge feutre** (`#c81e3a`) : alertes uniquement. **Ambre** (`#a3530a`) : « en cours / en attente » dans les pastilles d'état.
+1. **La piste des 26 semaines** (accueil et carte du programme) : une barre par semaine, groupées par phase, semaines allégées plus courtes ; passé en menthe, semaine en cours en braise.
+2. **L'anneau de repos** : il se vide autour du chrono, puis passe au menthe quand c'est reparti.
 
-### Neutral
-- **Planche** (`#ffffff`) fond de l'app, **carte** (`#ffffff`) le tableau, **plateau** (`#edefea`) champs et boutons secondaires, **trait** (`#d8dbd4`) filets.
-- **Encre** (`#16191e`, 17,6:1) texte et structure ; **encre douce** (`#545a64`, 6,9:1) texte secondaire ; **encre pâle** (`#5f656f`, 5,9:1) indications.
-- **Cadre** (`#16191e`) : la barre de navigation, comme le cadre noir du tableau.
+## Écrans clés
 
-### Named Rules
-- **Une encre, un rôle.** Bleu = agir, vert = fait, rouge = alerte. Une couleur qui ne porte pas de sens n'a pas sa place.
-- **Le contraste se calcule.** Tout texte ≥ 4,5:1 sur son fond, vérifié par le calcul et par le détecteur.
+- **Accueil** : date en petit, piste, carte « Ce soir » (nom en très grand, bouton « Démarrer la séance »), semaine avec le nom des séances, tuiles du check-in qui mènent à chaque rubrique, puis les rubriques.
+- **Séance** : sans barre d'onglets. Retour + « Exercice n sur 7 », segments de progression, anneau de repos, nom de l'exercice, points des séries, charge et répétitions côte à côte, « la dernière fois », barre fixe « Série faite » + exercice suivant.
+- **Fin de séance** : coche menthe, « Push terminé », nouveaux records avec la courbe du max estimé, détail des séries, semaine, séance suivante, bouton craie « Retour à l'accueil ».
 
-## Typography
+## Règles
 
-Une seule famille, Barlow, auto-hébergée (licence SIL OFL, `fonts/`) : l'app reste hors ligne et sans service tiers.
-
-### Hierarchy
-- **Titres d'écran et de blocs** : Barlow Condensed 700 (38 px écran, 28–34 px séance, 32 px exercice). Condensée pour tenir les noms longs (« Développé couché haltères ») sur une ligne.
-- **Grands chiffres** : Barlow Condensed 700 pour tout ce qui se lit à distance de bras : chronomètre 84 px, charge et répétitions 40 px, compteurs 30–56 px, chiffres du bilan 26–44 px.
-- **Interface** : Barlow 400–700, corps 17 px, libellés 15 px 600, notes 15 px.
-- Chiffres tabulaires partout.
-
-### Named Rules
-- **Jamais de sur-titre.** Le titre porte seul ; l'information secondaire (date, « Exercice 2 sur 7 ») va dessous.
-- **Le condensé est pour les chiffres et les titres**, jamais pour un paragraphe ou un bouton.
-
-## Layout
-
-- Une colonne de 524 px de contenu utile (560 px avec les gouttières de 18 px), centrée ; sur iPhone, pleine largeur avec zones sûres.
-- En-tête collant : titre puis sous-titre. Barre de navigation fixe en bas, 5 onglets, alignée sur la colonne en grand écran.
-- 12 px entre les cartes, 18 px dans une carte ; groupes serrés, séparations nettes.
-- Zones tactiles ≥ 52 px pour les commandes principales, ≥ 44 px pour les liens ; ± du mode séance à 66 px.
-
-## Elevation & Depth
-
-Plat, comme un tableau. Les cartes se détachent par un filet de 1 px (`trait`), pas par une ombre. Seule la bulle des graphiques porte une ombre douce (décalée, floutée) car elle flotte au-dessus du tracé.
-
-## Shapes
-
-Coins de 10 px pour les commandes, 14 px pour les cartes, pilules pour les séries et les choix d'alternatives. Pas de verre, pas de halo, pas d'ombre dure.
-
-## Components
-
-### Buttons
-- **Principal** : aplat bleu, texte blanc 700, 56 px (66 px pour « Série faite »). Dans une carte bleue, il s'inverse : fond blanc, texte bleu.
-- **Secondaire** : plateau gris, texte encre. Les séances qui ne sont pas celles du jour ont un « Démarrer » secondaire.
-- États : appuyé (teinte plus foncée, légère réduction), désactivé (50 %), focus clavier (anneau bleu 3 px).
-
-### Chips
-- **Options de choix** (Faite / Non faite / Repos, Oui / Non, qualité 1–5, jours) : plateau gris ; sélectionné = bleu plein, texte blanc.
-- **Séries validées** : pilule vert pâle avec le trait de feutre (voir signature).
-
-### Cards / Containers
-- **Carte** : blanche, filet 1 px, coins 14 px.
-- **Carte d'action** (`carte--accent`) : aplat bleu, réservée à l'action du moment.
-- **Carte de rappel** : contour bleu 2 px (installation, rappels, séance du jour dans la liste).
-
-### Inputs / Fields
-Fond plateau, sans bordure ; au focus, fond blanc et contour bleu 2 px. Saisies numériques en Barlow Condensed. Taille de police ≥ 16 px (pas de zoom iOS).
-
-### Navigation
-Barre noire (le cadre du tableau), icônes au trait de 2 px, libellé actif blanc souligné d'un trait de feutre bleu.
-
-### Trait de feutre (composant signature)
-Chaque série validée est rayée d'un trait de feutre vert, tracé de gauche à droite en 380 ms (ease-out exponentielle). Le texte reste lisible sous le trait. C'est le seul mouvement « signé » de l'app ; il est supprimé si l'utilisateur demande moins d'animations.
-
-## Do's and Don'ts
-
-### Do:
-- Faire ressortir une seule action par écran (l'aplat bleu).
-- Écrire les chiffres en grand et en condensé.
-- Utiliser les icônes SVG de `js/icones.js`, au même trait.
-- Garder les commandes standard de l'iPhone (onglets, champs natifs d'heure et de date, roues de sélection).
-
-### Don't:
-- Pas de sur-titre ni d'étiquette en capitales au-dessus d'un titre.
-- Pas de caractères (‹ › − + ↑ ↓) ni d'emoji en guise d'icônes.
-- Pas de fond sombre avec un accent néon, pas d'anneaux de progression, pas de dégradé de texte.
-- Pas de bande colorée épaisse sur un côté d'une carte ou d'une case.
-- Pas d'effet « écrit à la main » dans les textes : le tableau blanc prête ses encres et son geste, pas son écriture.
+- Cibles tactiles ≥ 44 px ; boutons d'action ≥ 56 px.
+- Contrastes ≥ 4,5:1 pour le texte (vérifiés), ≥ 3:1 pour les grands chiffres.
+- Navigation : barre flottante d'icônes, libellés lus par VoiceOver.
+- Petits écrans (hauteur ≤ 740 px) : anneau et actions de repos côte à côte, pour que les champs restent visibles au-dessus de « Série faite ».
+- Mouvement réduit respecté (`prefers-reduced-motion`).

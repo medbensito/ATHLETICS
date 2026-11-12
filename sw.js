@@ -14,7 +14,7 @@
  * et ne sont jamais touchées par ce fichier.
  */
 
-const VERSION = 'v2.2.0';
+const VERSION = 'v3.0.0';
 const CACHE = `athletics-${VERSION}`;
 
 // Chemins relatifs : l'app fonctionne aussi dans un sous-dossier (ex. GitHub Pages).
@@ -23,12 +23,13 @@ const FICHIERS = [
   './index.html',
   './manifest.json',
   './css/style.css',
-  './fonts/barlow-latin-400-normal.woff2',
-  './fonts/barlow-latin-500-normal.woff2',
-  './fonts/barlow-latin-600-normal.woff2',
-  './fonts/barlow-latin-700-normal.woff2',
-  './fonts/barlow-condensed-latin-600-normal.woff2',
-  './fonts/barlow-condensed-latin-700-normal.woff2',
+  './fonts/inter-tight-latin-400-normal.woff2',
+  './fonts/inter-tight-latin-500-normal.woff2',
+  './fonts/inter-tight-latin-600-normal.woff2',
+  './fonts/inter-tight-latin-700-normal.woff2',
+  './fonts/big-shoulders-display-latin-700-normal.woff2',
+  './fonts/big-shoulders-display-latin-800-normal.woff2',
+  './fonts/big-shoulders-display-latin-900-normal.woff2',
   './js/app.js',
   './js/version.js',
   './js/icones.js',
@@ -47,6 +48,8 @@ const FICHIERS = [
   './js/alternatives.js',
   './js/records.js',
   './js/progression.js',
+  './js/piste.js',
+  './js/vues/fin-seance.js',
   './js/vues/checkin.js',
   './js/vues/reglages.js',
   './js/vues/seances.js',

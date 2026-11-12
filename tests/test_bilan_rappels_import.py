@@ -61,7 +61,7 @@ with sync_playwright() as p:
     page.wait_for_selector('.regularite')
     texte = page.locator('#contenu').inner_text()
     msg = page.locator('.message-semaine').inner_text()
-    verifier("titre et période", page.locator('#titre-ecran').inner_text() == "Cette semaine" and "9 nov" in page.locator('#sur-titre').inner_text().lower())
+    verifier("titre et période", page.locator('#titre-ecran').text_content() == "Cette semaine" and "9 nov" in page.locator('#sur-titre').inner_text().lower())
     verifier("séances 2 / 5 (journal + check-in)", "2\n / 5" in texte or "2 / 5" in texte, texte[:200].replace("\n", "|"))
     verifier("check-ins 2 / 3 jours", "2\n / 3" in texte or "2 / 3" in texte)
     verifier("sommeil moyen 7 h 30", "7 h 30" in texte)

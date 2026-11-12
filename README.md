@@ -3,13 +3,13 @@
 Application web progressive (PWA) personnelle de suivi de transformation physique.
 Tout reste sur l'appareil : pas de serveur, pas de compte, pas de service tiers.
 
-**Version 2.2.0** — check-in quotidien et séance du jour, programme sur-mesure de 6 mois (Push / Pull / Legs / Upper / Lower) et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire et calendrier, records, rappels, sauvegarde et restauration JSON.
+**Version 3.0.0** (refonte « Projecteur ») — check-in quotidien et séance du jour, programme sur-mesure de 6 mois (Push / Pull / Legs / Upper / Lower) et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire et calendrier, records, rappels, sauvegarde et restauration JSON.
 
 App en ligne : <https://medbensito.github.io/ATHLETICS/> (dépôt `medbensito/ATHLETICS`, GitHub Pages sur la branche `main`).
 
 ## Structure du projet
 
-Depuis la 2.0 : le dossier `fonts/` contient les polices Barlow et Barlow Condensed (licence SIL OFL, fichier `fonts/OFL.txt`), servies localement pour fonctionner hors ligne ; `js/icones.js` regroupe les icônes SVG (flèches, plus, moins).
+Depuis la 3.0 : le dossier `fonts/` contient les polices Inter Tight et Big Shoulders Display (licence SIL OFL, fichiers `fonts/OFL-*.txt`), servies localement pour fonctionner hors ligne ; `js/icones.js` regroupe les icônes SVG ; `js/piste.js` dessine la piste des 26 semaines ; `js/vues/fin-seance.js` est l'écran de fin de séance.
 
 ```
 ATHLETICS/
@@ -61,13 +61,16 @@ ATHLETICS/
 - Compteurs (repas équilibrés, cigarettes) : depuis l'état vide, **−** note zéro et **+** note 1.
 - Sommeil : il s'agit de la nuit qui précède le jour affiché. La durée est calculée automatiquement, y compris quand la nuit passe minuit. Dès qu'une nuit a été saisie, un bouton propose de reprendre les mêmes heures.
 - Les flèches **‹ ›** permettent de remplir ou corriger un jour passé.
+- Les quatre tuiles (Séance, Sommeil, Alimentation, Cigarettes) mènent directement à la rubrique ; un rond menthe coché indique qu'elle est remplie.
+- En haut, la **piste des 26 semaines** montre où tu en es dans le programme (une barre par semaine, les semaines allégées plus courtes).
 
 ## Séance du jour
 
 - Chaque séance peut avoir un jour (le programme sur-mesure les règle : mardi Push, mercredi Pull, jeudi Legs, samedi Upper, dimanche Lower). Le jour se change dans l'éditeur, ou se met sur « Libre ».
-- L'écran **Aujourd'hui** affiche la séance prévue avec un bouton **Démarrer** : un appui et le mode séance s'ouvre. Une séance commencée y apparaît avec **Reprendre**.
+- L'écran **Aujourd'hui** affiche la séance prévue (« Ce soir ») avec un bouton **Démarrer la séance** : un appui et le mode séance s'ouvre. Une séance commencée y apparaît avec **Reprendre**.
 - Les jours sans séance, l'écran indique un jour de repos et suggère une marche.
 - La carte disparaît dès que la séance est faite, ou si « Repos » ou « Non faite » est coché dans le check-in.
+- En fin de séance, un écran récapitule la séance : séries faites, nouveaux records avec la courbe du max estimé, semaine en cours et prochaine séance.
 
 ## Utiliser les séances
 
@@ -228,3 +231,4 @@ Les mises à jour ne touchent jamais les données saisies.
 - [x] **2.0** — refonte visuelle « tableau blanc de salle » : thème clair, polices Barlow embarquées, icônes dessinées, bande de la semaine à l'accueil
 - [x] **2.1** — chrono de repos compact (les champs restent visibles), sauvegarde en un geste depuis l'accueil
 - [x] **2.2** — courbe de progression par exercice (charge, max estimé ou durée), accès depuis les records
+- [x] **3.0** — refonte « Projecteur » : thème sombre, piste des 26 semaines, carte du soir, tuiles du check-in, anneau de repos, écran de fin de séance avec records

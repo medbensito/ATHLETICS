@@ -14,4 +14,5 @@ export const ICONES = {
   moins: svg('<path d="M5 12h14"/>'),
   haut: svg('<path d="M12 19V5M6 11l6-6 6 6"/>'),
   bas: svg('<path d="M12 5v14M6 13l6 6 6-6"/>'),
+  coche: svg('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
 };

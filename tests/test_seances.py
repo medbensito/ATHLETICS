@@ -108,7 +108,7 @@ with sync_playwright() as p:
     page.click('[data-action="repos-fin"]')
     page.fill('.nombre__champ[data-champ="reps"]', "6")
     page.click('[data-action="valider"]')  # fin du squat → passe à la presse, repos 2 s
-    verifier("passage à l'exercice suivant", page.locator('.exo__nom').inner_text() == "Presse à cuisses")
+    verifier("passage à l'exercice suivant", page.locator('.exo__nom').text_content() == "Presse à cuisses")
     page.wait_for_function("document.querySelector('[data-role=\"repos-temps\"]').textContent.includes('reparti')", timeout=5000)
     verifier("fin de repos signalée", page.locator('.chrono--fini').count() == 1)
     page.screenshot(path=CAPTURES + "j3-repos-fini.png")
@@ -117,10 +117,14 @@ with sync_playwright() as p:
     verifier("tout est fait : pas de repos, bouton principal", page.locator('[data-role="repos"]').is_hidden()
              and "bouton--secondaire" not in page.locator('[data-action="terminer"]').get_attribute("class"))
     page.click('[data-action="terminer"]')
-    page.wait_for_selector('.annonce')
-    verifier("message de fin", "3 séries" in page.locator('.annonce').inner_text(), page.locator('.annonce').inner_text())
-    verifier("séance dans les dernières séances", page.locator('text=Dernières séances').count() == 1)
+    page.wait_for_selector('.fin')
+    verifier("écran de fin : récapitulatif", "3 séries" in page.locator('.fin .meta').inner_text(), page.locator('.fin .meta').inner_text())
     page.screenshot(path=CAPTURES + "j3-fin.png", full_page=True)
+    page.click('text=Retour à l\'accueil')
+    page.wait_for_selector('[data-rubrique="seance"]')
+    page.goto(URL + "#/seances")
+    page.wait_for_selector('text=Dernières séances')
+    verifier("séance dans les dernières séances", page.locator('text=Dernières séances').count() == 1)
 
     # Check-in du jour coché automatiquement
     page.click('.onglet[data-route="aujourdhui"]')
@@ -132,17 +136,19 @@ with sync_playwright() as p:
     page.click('[data-action="demarrer"] >> nth=2')
     page.wait_for_selector('[data-action="valider"]')
     verifier("pré-remplissage depuis la dernière fois", page.locator('.nombre__champ[data-champ="charge"]').input_value() == "65"
-             and "La dernière fois : 65 kg × 7" in page.locator('.exo .carte__note').first.inner_text(),
-             page.locator('.exo .carte__note').first.inner_text())
+             and "La dernière fois : 65 kg × 7" in page.locator('.exo__prevu').inner_text(),
+             page.locator('.exo__prevu').inner_text())
     page.click('[data-action="pas"][data-champ="charge"][data-pas="1"]')
     page.click('[data-action="valider"]')
     page.click('[data-action="terminer"]')  # séries restantes → confirmation acceptée
-    page.wait_for_selector('.annonce')
+    page.wait_for_selector('.fin')
+    page.goto(URL + "#/seances")
+    page.wait_for_selector('[data-action="demarrer"], .carte--plan')
     page.click('text=Modifier >> nth=2')
     page.click('text=Historique >> nth=0')
     page.wait_for_selector('.chiffres')
     texte = page.locator('#contenu').inner_text()
-    verifier("historique : dernière charge et progression", "67,5 kg" in texte and "+ 2,5 kg" in texte and page.locator('#titre-ecran').inner_text() == "Squat", texte.replace("\n", " | ")[:200])
+    verifier("historique : dernière charge et progression", "67,5 kg" in texte and "+ 2,5 kg" in texte and page.locator('#titre-ecran').text_content() == "Squat", texte.replace("\n", " | ")[:200])
     page.screenshot(path=CAPTURES + "j3-historique.png")
 
     # Abandon : rien n'est enregistré

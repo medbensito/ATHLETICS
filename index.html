@@ -7,14 +7,14 @@
   <!-- viewport-fit=cover : l'app s'étend sous l'encoche ; les marges sont gérées en CSS (zones sûres) -->
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="Suivi personnel de transformation physique : check-in, séances, corps, bilan.">
-  <meta name="theme-color" content="#FFFFFF">
-  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#0F1115">
+  <meta name="color-scheme" content="dark">
 
   <!-- PWA : manifest + réglages spécifiques iOS -->
   <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Athletics">
   <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -22,9 +22,9 @@
   <!-- Empêche iOS de transformer les nombres en liens téléphoniques -->
   <meta name="format-detection" content="telephone=no">
 
-  <!-- Polices auto-hébergées (Barlow, licence SIL OFL) : hors ligne, sans service tiers -->
-  <link rel="preload" href="fonts/barlow-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <!-- Polices auto-hébergées (Inter Tight et Big Shoulders Display, licence SIL OFL) : hors ligne, sans service tiers -->
+  <link rel="preload" href="fonts/inter-tight-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/big-shoulders-display-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -40,7 +40,7 @@
   <!-- Contenu de l'écran courant, rendu par js/app.js -->
   <main class="contenu" id="contenu" tabindex="-1"></main>
 
-  <!-- Navigation basse : atteignable au pouce -->
+  <!-- Navigation basse : barre flottante, atteignable au pouce (libellés lus par VoiceOver) -->
   <nav class="onglets" aria-label="Navigation principale">
     <a class="onglet" href="#/aujourdhui" data-route="aujourdhui">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>

@@ -5,6 +5,7 @@
  *   #/seances                    liste des séances du programme
  *   #/seances/modifier/<id>      éditeur d'une séance
  *   #/seances/en-cours           mode séance            (js/vues/seance-en-cours.js)
+ *   #/seances/fin/<id>           fin de séance          (js/vues/fin-seance.js)
  *   #/seances/exercice/<id>      historique d'un exercice (js/vues/exercice.js)
  */
 
@@ -21,12 +22,15 @@ import {
 } from '../plan.js';
 import { demarrerSeance, seanceDuJour, NOMS_JOURS_LONGS } from '../seance-du-jour.js';
 import * as enCours from './seance-en-cours.js';
+import * as fin from './fin-seance.js';
+import { pisteTransformation } from '../piste.js';
 import * as exercice from './exercice.js';
 import * as records from './records.js';
 import { ICONES } from '../icones.js';
 
 export function monter(racine, params, entete) {
   if (params[0] === 'en-cours') return enCours.monter(racine, params, entete);
+  if (params[0] === 'fin') return fin.monter(racine, params.slice(1), entete);
   if (params[0] === 'exercice') return exercice.monter(racine, params.slice(1), entete);
   if (params[0] === 'modifier') return editeur(racine, params[1], entete);
   if (params[0] === 'records') return records.monter(racine, params.slice(1), entete);
@@ -217,9 +221,7 @@ function cartePlan(plan) {
       <p class="carte__texte">${termine
         ? `Les ${DUREE_SEMAINES} semaines sont terminées. Continue la phase ${actuelle.numero} en augmentant les charges, ou fais le point sur tes objectifs avant un nouveau cycle.`
         : `Semaine ${semaine} sur ${DUREE_SEMAINES}${allegee ? ' · semaine allégée' : ''}`}</p>
-      <div class="barre" role="img" aria-label="Semaine ${Math.min(semaine, DUREE_SEMAINES)} sur ${DUREE_SEMAINES}">
-        <span class="barre__remplie" style="width:${Math.round((Math.min(semaine, DUREE_SEMAINES) / DUREE_SEMAINES) * 100)}%"></span>
-      </div>
+      ${pisteTransformation(plan, undefined, { entete: false })}
       ${allegee ? '<p class="carte__note">Cette semaine, une série de moins par exercice, à charge égale : le corps récupère et progresse ensuite.</p>' : ''}
       ${planAncien(plan) ? `
         <p class="carte__texte">Nouvelle répartition disponible : Push, Pull, Legs, Upper, Lower, le mardi, mercredi, jeudi, samedi et dimanche. Ta semaine et ta phase sont conservées.</p>

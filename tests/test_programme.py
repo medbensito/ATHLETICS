@@ -29,7 +29,7 @@ def reglages(page):
 def finir_exercice(page, charge=None, reps=None):
     """Valide toutes les séries restantes de l'exercice affiché (en passant le repos)."""
     while page.locator('[data-action="valider"]').count():
-        nom = page.locator('.exo__nom').inner_text()
+        nom = page.locator('.exo__nom').text_content()
         if charge is not None and page.locator('.nombre__champ[data-champ="charge"]').count():
             page.fill('.nombre__champ[data-champ="charge"]', charge)
         if reps is not None:
@@ -37,7 +37,7 @@ def finir_exercice(page, charge=None, reps=None):
         page.click('[data-action="valider"]')
         if page.locator('[data-action="repos-fin"]').is_visible():
             page.click('[data-action="repos-fin"]')
-        if page.locator('.exo__nom').inner_text() != nom:
+        if page.locator('.exo__nom').text_content() != nom:
             return
 
 
@@ -58,7 +58,7 @@ with sync_playwright() as p:
     page.wait_for_selector('[data-action="plan-demarrer"]')
     page.click('[data-action="plan-demarrer"]')
     page.wait_for_selector('.carte--plan')
-    noms = page.locator('.seance__nom').all_inner_texts()
+    noms = page.locator('.seance__nom').all_text_contents()
     verifier("phase 1 : Push, Pull, Legs, Upper, Lower", noms == ["Fondations"] + PHASE1, json.dumps(noms, ensure_ascii=False))
     desc = page.locator('.seance__description').all_inner_texts()
     verifier("jours dans les descriptions", [d.split(' ·')[0] for d in desc] == ["Mardi", "Mercredi", "Jeudi", "Samedi", "Dimanche"], json.dumps(desc, ensure_ascii=False))
@@ -70,17 +70,19 @@ with sync_playwright() as p:
     # --- Push : échauffement, développé couché, cardio sans charge
     page.click('[data-action="demarrer"] >> nth=0')
     page.wait_for_selector('[data-action="valider"]')
-    verifier("échauffement en minutes, sans charge", page.locator('.nombre__libelle').all_inner_texts() == ["Minutes"])
+    verifier("échauffement en minutes, sans charge", page.locator('.nombre__libelle').all_text_contents() == ["Minutes"])
     finir_exercice(page)
-    verifier("premier exercice : développé couché haltères", page.locator('.exo__nom').inner_text() == "Développé couché haltères"
+    verifier("premier exercice : développé couché haltères", page.locator('.exo__nom').text_content() == "Développé couché haltères"
              and "Omoplates" in page.locator('.exo__consigne').inner_text())
     finir_exercice(page, charge="20", reps="10")
     ouvrir(page, "Cardio zone 2")
-    verifier("cardio de fin : 15 min, sans charge", page.locator('.nombre__libelle').all_inner_texts() == ["Minutes"]
+    verifier("cardio de fin : 15 min, sans charge", page.locator('.nombre__libelle').all_text_contents() == ["Minutes"]
              and page.locator('.nombre__champ[data-champ="reps"]').input_value() == "15")
     finir_exercice(page)
     page.click('[data-action="terminer"]')
-    page.wait_for_selector('.annonce')
+    page.wait_for_selector('.fin')
+    page.goto(URL + "#/seances")
+    page.wait_for_selector('[data-action="demarrer"], .carte--plan')
 
     # --- Legs : planche en secondes, pas de 5
     page.click('[data-action="demarrer"] >> nth=2')
@@ -113,17 +115,17 @@ with sync_playwright() as p:
              and page.locator('[data-action="phase-suivante"][data-phase="2"]').count() == 1)
     page.click('[data-action="phase-suivante"]')
     page.wait_for_function("document.querySelector('.carte--plan h2').textContent === 'Construction'")
-    verifier("phase 2 : même répartition", page.locator('.seance__nom').all_inner_texts()[1:] == PHASE1)
+    verifier("phase 2 : même répartition", page.locator('.seance__nom').all_text_contents()[1:] == PHASE1)
 
     # Upper phase 2 : intervalles en secondes, sans charge, non allégés ; muscu allégée
     page.click('[data-action="demarrer"] >> nth=3')
     page.wait_for_selector('[data-action="valider"]')
     finir_exercice(page)
     verifier("muscu allégée : 3 séries au lieu de 4", "Série 1 sur 3" in page.locator('.exo__serie').inner_text()
-             and page.locator('.exo__nom').inner_text() == "Développé militaire barre")
+             and page.locator('.exo__nom').text_content() == "Développé militaire barre")
     ouvrir(page, "Intervalles")
     verifier("intervalles : 8 × 30 s, sans charge, non allégés", "Série 1 sur 8" in page.locator('.exo__serie').inner_text()
-             and page.locator('.nombre__libelle').all_inner_texts() == ["Secondes"]
+             and page.locator('.nombre__libelle').all_text_contents() == ["Secondes"]
              and page.locator('.nombre__champ[data-champ="reps"]').input_value() == "30")
     page.click('[data-action="valider"]')
     t = page.locator('[data-role="repos-temps"]').inner_text()
@@ -152,7 +154,7 @@ with sync_playwright() as p:
     page.click('[data-action="plan-mettre-a-jour"]')
     page.wait_for_selector('.annonce')
     r = reglages(page)
-    verifier("mise à niveau : séances PPL + UL", page.locator('.seance__nom').all_inner_texts()[1:] == PHASE1)
+    verifier("mise à niveau : séances PPL + UL", page.locator('.seance__nom').all_text_contents()[1:] == PHASE1)
     verifier("mise à niveau : début et phase conservés, version 2", r["plan"]["debut"] == "2026-11-02" and r["plan"]["phase"] == 1 and r["plan"]["version"] == 2)
     verifier("mise à niveau : heures des rappels conservées, jours mis à jour",
              r["rappels"]["heureSeance"] == "19:00" and r["rappels"]["heureCheckin"] == "22:00" and sorted(r["rappels"]["jours"]) == [0, 2, 3, 4, 6])

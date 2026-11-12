@@ -23,13 +23,13 @@ METTRE = """(args) => new Promise((res) => { const q = indexedDB.open('athletics
 
 def finir_exercice(page, charge=None):
     while page.locator('[data-action="valider"]').count():
-        nom = page.locator('.exo__nom').inner_text()
+        nom = page.locator('.exo__nom').text_content()
         if charge is not None and page.locator('.nombre__champ[data-champ="charge"]').count():
             page.fill('.nombre__champ[data-champ="charge"]', charge)
         page.click('[data-action="valider"]')
         if page.locator('[data-action="repos-fin"]').is_visible():
             page.click('[data-action="repos-fin"]')
-        if page.locator('.exo__nom').inner_text() != nom:
+        if page.locator('.exo__nom').text_content() != nom:
             return
 
 
@@ -63,12 +63,12 @@ with sync_playwright() as p:
     # --- Mardi : Push à l'accueil
     accueil(page)
     carte = page.locator('.seance-jour')
-    verifier("mardi : Push proposé", "mardi · séance du jour" in carte.inner_text().lower() and "Push · poussée" in carte.inner_text()
-             and "Démarrer · 7 exercices" in carte.inner_text(), carte.inner_text().replace("\n", "|"))
+    verifier("mardi : Push proposé", "ce soir" in carte.inner_text().lower() and "Push · poussée · 7 exercices" in carte.inner_text()
+             and "Démarrer la séance" in carte.inner_text(), carte.inner_text().replace("\n", "|"))
     page.screenshot(path=CAPTURES + "jour-accueil.png")
     page.click('[data-action="demarrer-seance"]')
     page.wait_for_selector('[data-action="valider"]')
-    verifier("démarrage direct en mode séance", page.locator('#titre-ecran').inner_text() == "Push · poussée")
+    verifier("démarrage direct en mode séance", page.locator('#titre-ecran').text_content() == "Push · poussée")
     accueil(page)
     verifier("séance en cours : Reprendre", "séance en cours" in page.locator('.seance-jour').inner_text().lower()
              and page.locator('.seance-jour a.bouton').inner_text() == "Reprendre")
@@ -86,7 +86,7 @@ with sync_playwright() as p:
     page.click('[data-action="remplacer-choisir"]:has-text("Développé couché machine")')
     page.screenshot(path=CAPTURES + "jour-remplacer.png")
     page.click('[data-action="remplacer-valider"][data-duree="seance"]')
-    verifier("exercice remplacé", page.locator('.exo__nom').inner_text() == "Développé couché machine"
+    verifier("exercice remplacé", page.locator('.exo__nom').text_content() == "Développé couché machine"
              and "Remplace : Développé couché haltères" in page.locator('.exo').inner_text())
     verifier("pas de charge reprise (jamais fait)", page.locator('.nombre__champ[data-champ="charge"]').input_value() == "")
     page.fill('.nombre__champ[data-champ="charge"]', "40")
@@ -96,15 +96,17 @@ with sync_playwright() as p:
     finir_exercice(page, charge="40")
 
     # --- Remplacement durable, saisie libre
-    verifier("exercice suivant", page.locator('.exo__nom').inner_text() == "Développé militaire haltères assis")
+    verifier("exercice suivant", page.locator('.exo__nom').text_content() == "Développé militaire haltères assis")
     page.click('[data-action="remplacer-ouvrir"]')
     page.fill('[data-role="remplacer-libre"]', "Développé militaire à la Smith")
     page.click('[data-action="remplacer-valider"][data-duree="toujours"]')
     page.wait_for_function("document.querySelector('.exo__nom').textContent.includes('Smith')", timeout=5000)
-    verifier("remplacement libre", page.locator('.exo__nom').inner_text() == "Développé militaire à la Smith", page.locator('.exo__nom').inner_text() + " | " + page.locator('.exo').inner_text()[:200].replace("\n", "|"))
+    verifier("remplacement libre", page.locator('.exo__nom').text_content() == "Développé militaire à la Smith", page.locator('.exo__nom').text_content() + " | " + page.locator('.exo').inner_text()[:200].replace("\n", "|"))
     finir_exercice(page, charge="20")
     page.click('[data-action="terminer"]')
-    page.wait_for_selector('.annonce')
+    page.wait_for_selector('.fin')
+    page.goto(URL + "#/seances")
+    page.wait_for_selector('[data-action="demarrer"], .carte--plan')
 
     push = next(s for s in page.evaluate(LIRE, "seances") if s["nom"] == "Push · poussée")
     noms = [e["nom"] for e in push["exercices"]]

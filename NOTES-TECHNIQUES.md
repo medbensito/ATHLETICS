@@ -264,6 +264,30 @@ Document tenu à jour à chaque jalon : choix faits, et points à vérifier sur 
 - [ ] Toucher la courbe affiche la bulle ; toucher ailleurs la referme.
 - [ ] La bascule Charge / Max estimé répond au premier toucher.
 
+## Choix techniques (3.0 — refonte « Projecteur »)
+
+Direction choisie sur le canevas de maquettes (option D), à partir de la piste B « Vestiaire de nuit ».
+
+| Sujet | Choix | Raison |
+|---|---|---|
+| Thème | Sombre (`color-scheme: dark`), fond #0f1115 éclairé par le haut, grain très léger | Lisible en salle et le soir ; l'écran ne fatigue pas les yeux au check-in de 21 h. |
+| Couleurs | Braise (#ff6b2c) = action, menthe (#3ddc97) = fait, craie = sélection ; texte foncé sur les trois | Un rôle par couleur ; contrastes vérifiés (≥ 4,5:1). |
+| Polices | Big Shoulders Display (titres, chiffres) et Inter Tight (texte), en woff2 dans `fonts/` | Chiffres étroits et très lisibles ; hors ligne. |
+| Navigation | Barre flottante d'icônes, libellés lus par VoiceOver ; masquée en séance et en fin de séance | Mode concentré pendant l'effort. |
+| Accueil | Piste des 26 semaines (phases, semaines allégées), carte « Ce soir » en titre géant, semaine avec le nom des séances, tuiles du check-in qui mènent à chaque rubrique | Toute la transformation et la journée en un écran. |
+| Séance | Anneau de repos qui se vide (durée totale gardée dans `reposDuree`), points des séries, charge et répétitions côte à côte, « la dernière fois », barre « Série faite » + exercice suivant fixée en bas | Un geste entre deux séries ; rien n'est masqué, même sur iPhone SE (mise en page compacte sous 740 px de haut). |
+| Fin de séance | Nouvel écran `#/seances/fin/<id>` : récapitulatif, nouveaux records avec la courbe du max estimé, semaine, séance suivante | Le moment qui récompense ; remplace l'ancien message en haut de Séances. |
+| Ombres | Ombres neutres, pas de halo coloré | Signalé par le détecteur Impeccable ; plus sobre. |
+| Données | Aucun changement de base (VERSION_DB 3) ; le champ `reposDuree` d'une séance en cours est facultatif | Les séances commencées avec la 2.x reprennent normalement. |
+
+## Points à vérifier sur iPhone (3.0)
+
+- [ ] Après mise à jour, le thème sombre et les polices s'affichent, y compris hors ligne ; la barre d'état (heure, batterie) reste lisible sur le fond sombre.
+- [ ] L'anneau de repos se vide régulièrement, même après avoir verrouillé puis rouvert l'iPhone.
+- [ ] La barre « Série faite » ne cache ni la charge ni les répétitions pendant le repos.
+- [ ] Toucher une tuile du check-in amène à la bonne rubrique.
+- [ ] La nouvelle icône (fond sombre, trois barres) : il faut réinstaller l'app pour la voir — exporter ses données avant.
+
 ## Récapitulatif : ce qui ne peut être vérifié que sur un vrai iPhone
 
 - Installation, plein écran, encoche et barre d'accueil (J1).

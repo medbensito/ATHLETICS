@@ -1,5 +1,5 @@
 """Test 2.1 : rappel de sauvegarde à l'accueil (export en un geste, « Plus tard »)
-et chrono de repos compact qui ne masque plus les champs de la série."""
+et repos (anneau) qui ne masque pas les champs de la série, sur grand et petit écran."""
 from commun import LANCEMENT, CAPTURES
 import sys
 from playwright.sync_api import sync_playwright
@@ -32,7 +32,7 @@ def visibles_au_dessus_du_bouton(page):
     """Le champ Répétitions est-il entièrement visible au-dessus du bouton « Série faite » ?"""
     return page.evaluate("""() => {
         const champ = document.querySelectorAll('.exo .nombre')[1] || document.querySelector('.exo .nombre');
-        const bouton = document.querySelector('.exo [data-action="valider"]');
+        const bouton = document.querySelector('.barre-action');
         const a = champ.getBoundingClientRect(), b = bouton.getBoundingClientRect();
         return { bas: Math.round(a.bottom), bouton: Math.round(b.top), ok: a.bottom <= b.top };
     }""")
@@ -92,17 +92,16 @@ with sync_playwright() as p:
     page.wait_for_selector('.exo')
     # Aller au premier exercice avec charge et répétitions (après l'échauffement)
     for k in range(6):
-        page.click(f'[data-action="aller"][data-index="{k}"]')
+        page.click(f'[data-action="aller"][data-index="{k}"] >> nth=-1')
         page.wait_for_timeout(150)
         if page.locator('.exo .nombre').count() >= 2:
             break
-    page.click('.exo [data-action="valider"]')
+    page.click('[data-action="valider"]')
     page.wait_for_selector('[data-role="repos"]:not([hidden])')
     page.evaluate("window.scrollTo(0, 0)")
-    hauteur = page.evaluate("Math.round(document.querySelector('[data-role=\"repos\"]').getBoundingClientRect().height)")
-    verifier("chrono compact (≤ 110 px)", hauteur <= 110, f"{hauteur} px")
+    verifier("anneau de repos affiché", page.locator('[data-role="anneau"]').count() == 1)
     position = visibles_au_dessus_du_bouton(page)
-    verifier("champ Répétitions visible au-dessus de « Série faite » pendant le repos", position["ok"], str(position))
+    verifier("champ Répétitions visible au-dessus de la barre « Série faite » pendant le repos", position["ok"], str(position))
     page.screenshot(path=CAPTURES + "seance-repos-compact.png")
     nav.close()
 
@@ -115,8 +114,17 @@ with sync_playwright() as p:
     page.wait_for_selector('.carte--plan')
     page.locator('[data-action="demarrer"]').first.click()
     page.wait_for_selector('.exo')
-    style = page.evaluate("getComputedStyle(document.querySelector('.exo [data-action=\"valider\"]')).position")
-    verifier("petit écran : bouton dans le flux", style == "static", style)
+    for k in range(6):
+        page.click(f'[data-action="aller"][data-index="{k}"] >> nth=-1')
+        page.wait_for_timeout(150)
+        if page.locator('.exo .nombre').count() >= 2:
+            break
+    page.click('[data-action="valider"]')
+    page.wait_for_selector('[data-role="repos"]:not([hidden])')
+    page.evaluate("window.scrollTo(0, 0)")
+    position = visibles_au_dessus_du_bouton(page)
+    verifier("petit écran : champ Répétitions visible pendant le repos", position["ok"], str(position))
+    page.screenshot(path=CAPTURES + "seance-repos-petit.png")
     nav.close()
 
 print("erreurs console:", erreurs)

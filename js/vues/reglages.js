@@ -13,6 +13,7 @@ import {
 import { lireRappels, NOMS_JOURS, fichierCalendrier } from '../rappels.js';
 import { REPAS_PAR_DEFAUT } from '../bilan.js';
 import { VERSION_APP } from '../version.js';
+import { ICONES } from '../icones.js';
 
 function carteEtat() {
   const installee = estInstallee();
@@ -50,7 +51,7 @@ async function remettreFichier(fichier) {
 }
 
 export async function monter(racine, params, entete) {
-  entete({ titre: 'Réglages', surTitre: 'Application' });
+  entete({ titre: 'Réglages', surTitre: 'Rappels, sauvegarde, installation' });
 
   // État de l'écran, rechargé à chaque rendu.
   let exportPret = null;
@@ -109,9 +110,9 @@ export async function monter(racine, params, entete) {
         <div class="ligne">
           <p class="champ__libelle">Repas par jour</p>
           <div class="compteur" role="group" aria-label="Repas par jour">
-            <button type="button" class="compteur__bouton" data-repas="-1" aria-label="Retirer 1">−</button>
+            <button type="button" class="compteur__bouton" data-repas="-1" aria-label="Retirer 1">${ICONES.moins}</button>
             <output class="compteur__valeur">${repasParJour}</output>
-            <button type="button" class="compteur__bouton" data-repas="1" aria-label="Ajouter 1">+</button>
+            <button type="button" class="compteur__bouton" data-repas="1" aria-label="Ajouter 1">${ICONES.plus}</button>
           </div>
         </div>
         <p class="carte__note">Sert uniquement à calculer la part de repas équilibrés dans le bilan.</p>

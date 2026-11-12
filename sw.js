@@ -14,7 +14,7 @@
  * et ne sont jamais touchées par ce fichier.
  */
 
-const VERSION = 'v1.4.1';
+const VERSION = 'v2.0.0';
 const CACHE = `athletics-${VERSION}`;
 
 // Chemins relatifs : l'app fonctionne aussi dans un sous-dossier (ex. GitHub Pages).
@@ -23,8 +23,15 @@ const FICHIERS = [
   './index.html',
   './manifest.json',
   './css/style.css',
+  './fonts/barlow-latin-400-normal.woff2',
+  './fonts/barlow-latin-500-normal.woff2',
+  './fonts/barlow-latin-600-normal.woff2',
+  './fonts/barlow-latin-700-normal.woff2',
+  './fonts/barlow-condensed-latin-600-normal.woff2',
+  './fonts/barlow-condensed-latin-700-normal.woff2',
   './js/app.js',
   './js/version.js',
+  './js/icones.js',
   './js/db.js',
   './js/dates.js',
   './js/plateforme.js',

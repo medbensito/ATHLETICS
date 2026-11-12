@@ -8,6 +8,7 @@ import { dateCourte } from '../dates.js';
 import { echapper } from '../ui.js';
 import { historiqueExercice, formatCharge, formatSerie } from '../programme.js';
 import { recordsExercice } from '../records.js';
+import { ICONES } from '../icones.js';
 
 export async function monter(racine, params, entete) {
   const id = params[0];
@@ -21,7 +22,7 @@ export async function monter(racine, params, entete) {
   entete({ titre: nom || 'Exercice', surTitre: 'Historique' });
 
   const passages = historiqueExercice(journal, id, nom);
-  const retour = '<button type="button" class="retour" data-action="retour">‹ Retour</button>';
+  const retour = '<button type="button" class="retour" data-action="retour">${ICONES.gauche}Retour</button>';
   racine.addEventListener('click', (evt) => {
     if (evt.target.closest('[data-action="retour"]')) {
       if (history.length > 1) history.back();

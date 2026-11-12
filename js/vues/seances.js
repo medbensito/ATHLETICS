@@ -9,7 +9,7 @@
  */
 
 import { lire, lireTout, ecrire, supprimer } from '../db.js';
-import { nomJour } from '../dates.js';
+import { nomJour, cleJour } from '../dates.js';
 import { echapper } from '../ui.js';
 import {
   lireProgramme, creerSeancesVides, chargerExemple, nouvelleSeance, nouvelExercice,
@@ -19,10 +19,11 @@ import {
   lirePlan, demarrerPlan, appliquerPhase, semaineDuPlan, phasePourSemaine, phase as phaseNumero,
   estSemaineAllegee, DUREE_SEMAINES, PHASES, planAncien,
 } from '../plan.js';
-import { demarrerSeance, NOMS_JOURS_LONGS } from '../seance-du-jour.js';
+import { demarrerSeance, seanceDuJour, NOMS_JOURS_LONGS } from '../seance-du-jour.js';
 import * as enCours from './seance-en-cours.js';
 import * as exercice from './exercice.js';
 import * as records from './records.js';
+import { ICONES } from '../icones.js';
 
 export function monter(racine, params, entete) {
   if (params[0] === 'en-cours') return enCours.monter(racine, params, entete);
@@ -37,7 +38,7 @@ export function monter(racine, params, entete) {
 // =====================================================================
 
 async function liste(racine, entete) {
-  entete({ titre: 'Séances', surTitre: 'Programme' });
+  entete({ titre: 'Séances', surTitre: 'Programme et séances réalisées' });
 
   // État de l'écran, rechargé à chaque rendu ; les gestionnaires (posés une seule fois) le lisent.
   let programme = [];
@@ -65,20 +66,25 @@ async function liste(racine, entete) {
       return;
     }
 
+    const duJour = seanceDuJour(programme, plan, cleJour());
     const carteSeance = (s) => {
       const derniere = terminees.find((j) => j.seanceId === s.id);
-      const noms = s.exercices.map((e) => e.nom).filter(Boolean);
+      const estDuJour = duJour && duJour.id === s.id;
+      // Les exercices de musculation d'abord ; échauffement et cardio résumés en une mention.
+      const muscu = s.exercices.filter((e) => e.nom && !e.sansCharge && e.unite !== 'min');
+      const annexes = s.exercices.length - muscu.length;
+      const noms = muscu.map((e) => e.nom);
       return `
-        <section class="carte">
+        <section class="carte ${estDuJour ? 'carte--du-jour' : ''}">
           <header class="seance__entete">
             <h2 class="seance__nom">${echapper(s.nom || 'Séance sans nom')}</h2>
             <a class="lien" href="#/seances/modifier/${s.id}">Modifier</a>
           </header>
           ${s.description ? `<p class="seance__description">${echapper(s.description)}</p>` : ''}
-          <p class="carte__texte">${noms.length ? echapper(noms.join(' · ')) : 'Aucun exercice pour l\'instant.'}</p>
-          <p class="carte__note">${s.exercices.length} exercice${s.exercices.length > 1 ? 's' : ''}${derniere ? ` · dernière fois : ${echapper(nomJour(derniere.date).toLowerCase())}` : ''}</p>
+          ${noms.length ? `<ul class="liste-exos">${noms.map((n) => `<li>${echapper(n)}</li>`).join('')}</ul>` : (s.exercices.length ? '' : '<p class="carte__texte">Aucun exercice pour l\'instant.</p>')}
+          <p class="carte__note">${estDuJour ? '<strong class="du-jour">Aujourd\'hui</strong> · ' : ''}${s.exercices.length} exercice${s.exercices.length > 1 ? 's' : ''}${annexes ? ' dont échauffement et cardio' : ''}${derniere ? ` · dernière fois : ${echapper(nomJour(derniere.date).toLowerCase())}` : ''}</p>
           ${seanceEnCours ? '' : s.exercices.length
-            ? `<button type="button" class="bouton" data-action="demarrer" data-id="${s.id}">Démarrer</button>`
+            ? `<button type="button" class="bouton ${estDuJour ? '' : 'bouton--secondaire'}" data-action="demarrer" data-id="${s.id}">Démarrer</button>`
             : `<a class="bouton bouton--secondaire" href="#/seances/modifier/${s.id}">Ajouter des exercices</a>`}
         </section>`;
     };
@@ -93,10 +99,10 @@ async function liste(racine, entete) {
           <a class="bouton" href="#/seances/en-cours">Reprendre</a>
         </section>` : ''}
       ${programme.map(carteSeance).join('')}
-      <button type="button" class="bouton bouton--secondaire" data-action="ajouter">+ Ajouter une séance</button>
+      <button type="button" class="bouton bouton--secondaire" data-action="ajouter">${ICONES.plus}Ajouter une séance</button>
       <a class="carte carte--lien carte--rangee" href="#/seances/records">
         <span class="carte__titre">Records et force estimée</span>
-        <span class="carte__fleche" aria-hidden="true">›</span>
+        <span class="carte__fleche">${ICONES.droite}</span>
       </a>
       ${terminees.length ? `
         <section class="carte">
@@ -206,8 +212,8 @@ function cartePlan(plan) {
 
   return `
     <section class="carte carte--plan">
-      <p class="exo__position">Programme sur-mesure · phase ${actuelle.numero} sur ${PHASES.length}</p>
       <h2 class="seance__nom">${echapper(actuelle.nom)}</h2>
+      <p class="meta">Programme sur-mesure · phase ${actuelle.numero} sur ${PHASES.length}</p>
       <p class="carte__texte">${termine
         ? `Les ${DUREE_SEMAINES} semaines sont terminées. Continue la phase ${actuelle.numero} en augmentant les charges, ou fais le point sur tes objectifs avant un nouveau cycle.`
         : `Semaine ${semaine} sur ${DUREE_SEMAINES}${allegee ? ' · semaine allégée' : ''}`}</p>
@@ -244,7 +250,7 @@ function cartePlan(plan) {
 async function editeur(racine, id, entete) {
   const seance = await lire('seances', id);
   if (!seance) { location.replace('#/seances'); return undefined; }
-  entete({ titre: 'Modifier', surTitre: 'Programme' });
+  entete({ titre: 'Modifier', surTitre: 'Séance du programme' });
 
   // Enregistrement automatique, légèrement différé pendant la frappe.
   let minuterie = null;
@@ -260,7 +266,7 @@ async function editeur(racine, id, entete) {
 
   function rendre() {
     racine.innerHTML = `
-      <a class="retour" href="#/seances">‹ Retour au programme</a>
+      <a class="retour" href="#/seances">${ICONES.gauche}Retour au programme</a>
       <label class="champ">
         <span class="champ__libelle">Nom de la séance</span>
         <input class="saisie" data-role="nom-seance" value="${echapper(seance.nom)}" placeholder="Ex. Jambes" maxlength="40" autocomplete="off">
@@ -288,8 +294,8 @@ async function editeur(racine, id, entete) {
             <input class="saisie" data-ex="${i}" data-champ="consigne" value="${echapper(ex.consigne || '')}" placeholder="Consigne (facultatif)" maxlength="160" autocomplete="off" aria-label="Consigne de l'exercice ${i + 1}">
           </div>
           <div class="exo-edit__actions">
-            <button type="button" class="icone" data-action="monter" data-ex="${i}" aria-label="Monter l'exercice" ${i === 0 ? 'disabled' : ''}>↑</button>
-            <button type="button" class="icone" data-action="descendre" data-ex="${i}" aria-label="Descendre l'exercice" ${i === seance.exercices.length - 1 ? 'disabled' : ''}>↓</button>
+            <button type="button" class="icone" data-action="monter" data-ex="${i}" aria-label="Monter l'exercice" ${i === 0 ? 'disabled' : ''}>${ICONES.haut}</button>
+            <button type="button" class="icone" data-action="descendre" data-ex="${i}" aria-label="Descendre l'exercice" ${i === seance.exercices.length - 1 ? 'disabled' : ''}>${ICONES.bas}</button>
             <a class="lien" href="#/seances/exercice/${ex.id}">Historique</a>
             <button type="button" class="lien lien--discret" data-action="retirer" data-ex="${i}">Retirer</button>
           </div>

@@ -3,11 +3,13 @@
 Application web progressive (PWA) personnelle de suivi de transformation physique.
 Tout reste sur l'appareil : pas de serveur, pas de compte, pas de service tiers.
 
-**Version 1.4.1** — check-in quotidien et séance du jour, programme sur-mesure de 6 mois (Push / Pull / Legs / Upper / Lower) et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire et calendrier, records, rappels, sauvegarde et restauration JSON.
+**Version 2.0.0** (refonte « tableau blanc ») — check-in quotidien et séance du jour, programme sur-mesure de 6 mois (Push / Pull / Legs / Upper / Lower) et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire et calendrier, records, rappels, sauvegarde et restauration JSON.
 
 App en ligne : <https://medbensito.github.io/ATHLETICS/> (dépôt `medbensito/ATHLETICS`, GitHub Pages sur la branche `main`).
 
 ## Structure du projet
+
+Depuis la 2.0 : le dossier `fonts/` contient les polices Barlow et Barlow Condensed (licence SIL OFL, fichier `fonts/OFL.txt`), servies localement pour fonctionner hors ligne ; `js/icones.js` regroupe les icônes SVG (flèches, plus, moins).
 
 ```
 ATHLETICS/
@@ -222,3 +224,4 @@ Les mises à jour ne touchent jamais les données saisies.
 - [x] **1.2** — répartition Push / Pull / Legs / Upper / Lower (mar, mer, jeu, sam, dim)
 - [x] **1.3** — séance du jour à l'accueil, remplacement d'exercice en séance
 - [x] **1.4** — calendrier de régularité, records et max estimé
+- [x] **2.0** — refonte visuelle « tableau blanc de salle » : thème clair, polices Barlow embarquées, icônes dessinées, bande de la semaine à l'accueil

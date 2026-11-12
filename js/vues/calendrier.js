@@ -12,6 +12,7 @@ import { echapper } from '../ui.js';
 import { checkinRempli } from '../bilan.js';
 import { lirePlan } from '../plan.js';
 import { seanceDuJour } from '../seance-du-jour.js';
+import { ICONES } from '../icones.js';
 
 const MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
 const deux = (n) => String(n).padStart(2, '0');
@@ -42,7 +43,7 @@ export async function monter(racine, params, entete) {
     lireTout('checkins'), lireTout('journal'), lireTout('seances'), lirePlan(),
   ]);
 
-  entete({ titre: `${MOIS[mois].charAt(0).toUpperCase()}${MOIS[mois].slice(1)} ${annee}`, surTitre: 'Bilan · calendrier' });
+  entete({ titre: `${MOIS[mois].charAt(0).toUpperCase()}${MOIS[mois].slice(1)} ${annee}`, surTitre: 'Calendrier de régularité' });
 
   const parDate = new Map(checkins.map((c) => [c.date, c]));
   const joursSeance = new Set(journal.filter((j) => j.fin).map((j) => j.date));
@@ -81,15 +82,15 @@ export async function monter(racine, params, entete) {
   const aDesDonneesAvant = premiereDonnee < premier;
 
   racine.innerHTML = `
-    <a class="retour" href="#/bilan">‹ Retour au bilan</a>
+    <a class="retour" href="#/bilan">${ICONES.gauche}Retour au bilan</a>
     <div class="jours">
       ${aDesDonneesAvant
-        ? `<a class="jours__fleche" href="#/bilan/mois/${precedent}" aria-label="Mois précédent">‹</a>`
-        : '<span class="jours__fleche jours__fleche--inactive" aria-hidden="true">‹</span>'}
+        ? `<a class="jours__fleche" href="#/bilan/mois/${precedent}" aria-label="Mois précédent">${ICONES.gauche}</a>`
+        : `<span class="jours__fleche jours__fleche--inactive" aria-hidden="true">${ICONES.gauche}</span>`}
       <p class="jours__etat">${seancesFaites} séance${seancesFaites > 1 ? 's' : ''} · ${joursNotes} jour${joursNotes > 1 ? 's' : ''} noté${joursNotes > 1 ? 's' : ''} sur ${joursEcoules}</p>
       ${cleMois(annee, mois) < moisCourant
-        ? `<a class="jours__fleche" href="#/bilan/mois/${suivant}" aria-label="Mois suivant">›</a>`
-        : '<span class="jours__fleche jours__fleche--inactive" aria-hidden="true">›</span>'}
+        ? `<a class="jours__fleche" href="#/bilan/mois/${suivant}" aria-label="Mois suivant">${ICONES.droite}</a>`
+        : `<span class="jours__fleche jours__fleche--inactive" aria-hidden="true">${ICONES.droite}</span>`}
     </div>
     <section class="carte">
       <div class="cal" role="group" aria-label="Calendrier de ${MOIS[mois]} ${annee}">

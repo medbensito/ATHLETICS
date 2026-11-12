@@ -8,13 +8,14 @@ import { dateCourte } from '../dates.js';
 import { echapper } from '../ui.js';
 import { formatCharge } from '../programme.js';
 import { calculerRecords } from '../records.js';
+import { ICONES } from '../icones.js';
 
 export async function monter(racine, params, entete) {
-  entete({ titre: 'Records', surTitre: 'Séances' });
+  entete({ titre: 'Records', surTitre: 'Meilleures charges et max estimé' });
   const records = [...calculerRecords(await lireTout('journal')).values()]
     .sort((a, b) => a.nom.localeCompare(b.nom, 'fr'));
 
-  const retour = '<a class="retour" href="#/seances">‹ Retour au programme</a>';
+  const retour = '<a class="retour" href="#/seances">${ICONES.gauche}Retour au programme</a>';
   if (!records.length) {
     racine.innerHTML = `
       ${retour}

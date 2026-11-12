@@ -7,6 +7,7 @@ import { cleJour, estCleJour, decalerJour, dateCourte, formatDuree } from '../da
 import { echapper } from '../ui.js';
 import { lundi, calculerBilan, messageSemaine, formatNombre } from '../bilan.js';
 import * as calendrier from './calendrier.js';
+import { ICONES } from '../icones.js';
 
 /** Écart avec la semaine précédente, en texte neutre (sans couleur ni jugement). */
 function ecart(actuel, precedent, format) {
@@ -39,7 +40,7 @@ export async function monter(racine, params, entete) {
 
   entete({
     titre: estActuelle ? 'Cette semaine' : `Semaine du ${dateCourte(cle).toLowerCase()}`,
-    surTitre: `Bilan · du ${dateCourte(cle).toLowerCase()} au ${dateCourte(s.dimanche).toLowerCase()}`,
+    surTitre: `Du ${dateCourte(cle).toLowerCase()} au ${dateCourte(s.dimanche).toLowerCase()}`,
   });
 
   const minutes = (m) => formatDuree(Math.round(m));
@@ -48,20 +49,20 @@ export async function monter(racine, params, entete) {
   racine.innerHTML = `
     <div class="jours">
       ${cle > premiereSemaine
-        ? `<a class="jours__fleche" href="#/bilan/${decalerJour(cle, -7)}" aria-label="Semaine précédente">‹</a>`
-        : '<span class="jours__fleche jours__fleche--inactive" aria-hidden="true">‹</span>'}
+        ? `<a class="jours__fleche" href="#/bilan/${decalerJour(cle, -7)}" aria-label="Semaine précédente">${ICONES.gauche}</a>`
+        : `<span class="jours__fleche jours__fleche--inactive" aria-hidden="true">${ICONES.gauche}</span>`}
       <p class="jours__etat">${estActuelle ? `Jour ${s.joursEcoules} sur 7` : 'Semaine terminée'}</p>
       ${estActuelle
-        ? '<span class="jours__fleche jours__fleche--inactive" aria-hidden="true">›</span>'
-        : `<a class="jours__fleche" href="#/bilan/${decalerJour(cle, 7)}" aria-label="Semaine suivante">›</a>`}
+        ? `<span class="jours__fleche jours__fleche--inactive" aria-hidden="true">${ICONES.droite}</span>`
+        : `<a class="jours__fleche" href="#/bilan/${decalerJour(cle, 7)}" aria-label="Semaine suivante">${ICONES.droite}</a>`}
     </div>
 
     <a class="carte carte--lien carte--rangee" href="#/bilan/mois/${cle.slice(0, 7)}">
       <span class="carte__titre">Calendrier du mois</span>
-      <span class="carte__fleche" aria-hidden="true">›</span>
+      <span class="carte__fleche">${ICONES.droite}</span>
     </a>
 
-    <section class="carte carte--accent message-semaine">
+    <section class="carte message-semaine">
       <p class="message-semaine__texte">${echapper(messageSemaine(s, p))}</p>
     </section>
 

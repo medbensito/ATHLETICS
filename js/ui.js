@@ -32,7 +32,7 @@ export function carteInstallation() {
     : `<p class="carte__texte">Sur iPhone : ouvre cette page dans Safari, puis Partager → Sur l'écran d'accueil.
        Sur ordinateur, l'app se teste directement ici.</p>`;
   return `
-    <section class="carte carte--accent">
+    <section class="carte carte--rappel">
       <h2 class="carte__titre">Installer sur l'écran d'accueil</h2>
       ${etapes}
       <p class="carte__note">Une fois installée, l'app garde ses données et s'ouvre en plein écran.</p>

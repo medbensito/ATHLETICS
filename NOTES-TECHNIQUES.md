@@ -210,6 +210,26 @@ Document tenu à jour à chaque jalon : choix faits, et points à vérifier sur 
 - [ ] Le calendrier tient sur l'écran sans défilement horizontal ; les cases se touchent facilement.
 - [ ] L'annonce de fin de séance affiche un nouveau record après une séance plus lourde.
 
+## Choix techniques (2.0 — refonte « tableau blanc »)
+
+| Sujet | Choix | Raison |
+|---|---|---|
+| Direction | « Tableau blanc de salle » : fond blanc, encre noire, feutres bleu (sélection, action) et vert (fait) | Usage principal en salle entre les séries : lisible d'un coup d'œil, même en pleine lumière. |
+| Thème | Clair uniquement (`color-scheme: light`) | Choix validé : le thème sombre n'était plus une contrainte. |
+| Polices | Barlow (texte) et Barlow Condensed (chiffres, titres), en woff2 dans `fonts/`, mises en cache par le service worker | Aucune dépendance réseau, chiffres larges et étroits pour le chrono et les charges. |
+| Icônes | SVG en ligne (`js/icones.js`) à la place des caractères ‹ › − + | Rendu identique sur tous les appareils. |
+| Accueil | Bande « la semaine en bref » (fait, prévu, repos, aujourd'hui) | Voir la régularité sans ouvrir le bilan. |
+| Séance | Bouton « Série faite » collé au-dessus des onglets, chrono en 64 px | Un seul geste entre deux séries. |
+| Accessibilité | Contrastes ≥ 4,5:1, cibles ≥ 44 px, animation coupée si « réduire les animations » | Vérifié par le détecteur Impeccable (aucune alerte sur les 6 écrans). |
+| Données | Aucun changement de base (VERSION_DB 3) | La refonte ne touche que l'affichage : les données existantes restent intactes. |
+
+## Points à vérifier sur iPhone (2.0)
+
+- [ ] Après mise à jour (fermer puis rouvrir l'app), le thème blanc et les nouvelles polices s'affichent, y compris hors ligne.
+- [ ] La barre d'état est lisible (texte sombre sur fond blanc).
+- [ ] En séance, le bouton « Série faite » reste accessible au pouce sans masquer le chrono.
+- [ ] L'icône de l'écran d'accueil est la nouvelle (il peut falloir supprimer puis réinstaller l'app — exporter d'abord ses données).
+
 ## Récapitulatif : ce qui ne peut être vérifié que sur un vrai iPhone
 
 - Installation, plein écran, encoche et barre d'accueil (J1).

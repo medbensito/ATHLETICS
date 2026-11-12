@@ -69,7 +69,15 @@ async function afficher() {
   // L'écran se construit hors de la page, puis remplace l'ancien d'un coup.
   const racine = document.createElement('div');
   racine.className = 'vue';
-  const entete = (infos) => { if (monJeton === jeton) majEntete(infos); };
+  // Le titre change en même temps que le contenu (jamais l'un sans l'autre).
+  // Une fois l'écran affiché, il peut encore le mettre à jour directement.
+  let infosEntete = null;
+  let affiche = false;
+  const entete = (infos) => {
+    if (monJeton !== jeton) return;
+    if (affiche) majEntete(infos);
+    else infosEntete = infos;
+  };
 
   let nettoyerNouveau = null;
   try {
@@ -91,6 +99,9 @@ async function afficher() {
   if (nettoyer) nettoyer();
   nettoyer = typeof nettoyerNouveau === 'function' ? nettoyerNouveau : null;
   $('#contenu').replaceChildren(racine);
+  document.body.dataset.ecran = params[0] ? `${nom}-${params[0]}` : nom;
+  if (infosEntete) majEntete(infosEntete);
+  affiche = true;
   window.scrollTo(0, 0);
 }
 

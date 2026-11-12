@@ -14,7 +14,7 @@ import {
 import { graphique, activerSurvol } from '../graphique.js';
 
 export async function monter(racine, params, entete) {
-  entete({ titre: 'Corps', surTitre: 'Suivi' });
+  entete({ titre: 'Corps', surTitre: 'Poids et tour de taille' });
 
   const aujourdhui = cleJour();
   // État de l'écran, rechargé à chaque rendu ; les gestionnaires plus bas le lisent.

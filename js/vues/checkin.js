@@ -31,6 +31,7 @@ import { carteRappelMesure } from './corps.js';
 import { lireRappels, rappelCheckinActif, rappelSeanceActif } from '../rappels.js';
 import { lirePlan, estSemaineAllegee } from '../plan.js';
 import { seanceDuJour, joursConnus, demarrerSeance, NOMS_JOURS_LONGS } from '../seance-du-jour.js';
+import { ICONES } from '../icones.js';
 
 const LIMITES = { repas: 10, cigarettes: 99 };
 
@@ -66,9 +67,9 @@ function choix(champ, options, libelleGroupe) {
 function compteur(champ, libelle, grand = false) {
   return `
     <div class="compteur ${grand ? 'compteur--grand' : ''}" role="group" aria-label="${echapper(libelle)}">
-      <button type="button" class="compteur__bouton" data-champ="${champ}" data-pas="-1" aria-label="Retirer 1">−</button>
+      <button type="button" class="compteur__bouton" data-champ="${champ}" data-pas="-1" aria-label="Retirer 1">${ICONES.moins}</button>
       <output class="compteur__valeur" data-affiche="${champ}" aria-live="polite">—</output>
-      <button type="button" class="compteur__bouton" data-champ="${champ}" data-pas="1" aria-label="Ajouter 1">+</button>
+      <button type="button" class="compteur__bouton" data-champ="${champ}" data-pas="1" aria-label="Ajouter 1">${ICONES.plus}</button>
     </div>`;
 }
 
@@ -86,11 +87,11 @@ function rubrique(id, titre, contenu, sousTitre = '') {
 function gabarit(date, estAujourdhui, habitude) {
   return `
     <div class="jours">
-      <a class="jours__fleche" href="#/aujourdhui/${decalerJour(date, -1)}" aria-label="Jour précédent">‹</a>
+      <a class="jours__fleche" href="#/aujourdhui/${decalerJour(date, -1)}" aria-label="Jour précédent">${ICONES.gauche}</a>
       <p class="jours__etat" data-role="progression" aria-live="polite"></p>
       ${estAujourdhui
-        ? '<span class="jours__fleche jours__fleche--inactive" aria-hidden="true">›</span>'
-        : `<a class="jours__fleche" href="#/aujourdhui/${decalerJour(date, 1)}" aria-label="Jour suivant">›</a>`}
+        ? `<span class="jours__fleche jours__fleche--inactive" aria-hidden="true">${ICONES.droite}</span>`
+        : `<a class="jours__fleche" href="#/aujourdhui/${decalerJour(date, 1)}" aria-label="Jour suivant">${ICONES.droite}</a>`}
     </div>
 
     ${rubrique('seance', 'Séance',
@@ -145,7 +146,7 @@ function gabarit(date, estAujourdhui, habitude) {
 /**
  * @param {HTMLElement} racine   conteneur de l'écran
  * @param {string[]}    params   suite de l'adresse : #/aujourdhui/2026-11-10 → ['2026-11-10']
- * @param {Function}    entete   met à jour le titre et le sur-titre de l'app
+ * @param {Function}    entete   met à jour le titre et le sous-titre de l'app
  */
 export async function monter(racine, params, entete) {
   const aujourdhui = cleJour();
@@ -179,8 +180,8 @@ export async function monter(racine, params, entete) {
       // Une séance commencée passe avant tout le reste.
       cartes += `
         <section class="carte carte--accent seance-jour">
-          <p class="exo__position">Séance en cours</p>
           <h2 class="seance__nom">${echapper(enCours.nomSeance)}</h2>
+          <p class="meta">Séance en cours</p>
           <a class="bouton" href="#/seances/en-cours">Reprendre</a>
         </section>`;
     } else if (prevue && !faiteAujourdhui) {
@@ -188,8 +189,8 @@ export async function monter(racine, params, entete) {
       const nb = prevue.exercices.length;
       cartes += `
         <section class="carte carte--accent seance-jour" data-rappel="seance">
-          <p class="exo__position">${NOMS_JOURS_LONGS[depuisCle(date).getDay()]} · séance du jour${estSemaineAllegee(plan) ? ' · semaine allégée' : ''}</p>
           <h2 class="seance__nom">${echapper(prevue.nom)}</h2>
+          <p class="meta">${NOMS_JOURS_LONGS[depuisCle(date).getDay()]} · séance du jour${estSemaineAllegee(plan) ? ' · semaine allégée' : ''}</p>
           ${prevue.description ? `<p class="carte__texte">${echapper(prevue.description.replace(/^[^·]*·\s*/, ''))}</p>` : ''}
           ${nb ? `<button type="button" class="bouton" data-action="demarrer-seance" data-id="${prevue.id}">Démarrer · ${nb} exercice${nb > 1 ? 's' : ''}</button>`
             : `<a class="bouton bouton--secondaire" href="#/seances/modifier/${prevue.id}">Ajouter des exercices</a>`}
@@ -198,7 +199,8 @@ export async function monter(racine, params, entete) {
     } else if (!prevue && !faiteAujourdhui && joursConnus(seances, plan)) {
       cartes += `
         <section class="carte seance-jour" data-rappel="seance">
-          <p class="exo__position">${NOMS_JOURS_LONGS[depuisCle(date).getDay()]} · jour de repos</p>
+          <h2 class="seance__nom">Jour de repos</h2>
+          <p class="meta">${NOMS_JOURS_LONGS[depuisCle(date).getDay()]} · jour de repos</p>
           <p class="carte__texte">Pas de séance prévue. Une marche de 30 à 45 minutes, si tu en as envie : elle aide la perte de graisse sans gêner la récupération.</p>
         </section>`;
     }
@@ -217,7 +219,9 @@ export async function monter(racine, params, entete) {
           <span class="carte__texte">Quelques touches suffisent, rien n'est obligatoire.</span>
         </div>`;
     }
-    if (cartes) $('.jours').insertAdjacentHTML('afterend', cartes);
+    // La semaine en un coup d'œil : chaque jour fait est coché d'un trait de feutre.
+    if (joursConnus(seances, plan) || journal.some((j) => j.fin)) cartes += semaineEnBref(date, tous, journal, seances, plan);
+    if (cartes) $('.jours').insertAdjacentHTML('beforebegin', cartes);
   }
 
   const champCoucher = $('[data-heure="coucher"]');
@@ -238,6 +242,7 @@ export async function monter(racine, params, entete) {
     racine.querySelectorAll('[data-affiche]').forEach((sortie) => {
       const valeur = checkin[sortie.dataset.affiche];
       sortie.textContent = valeur === null ? '—' : String(valeur);
+      sortie.classList.toggle('compteur__valeur--vide', valeur === null);
     });
 
     $('[data-role="duree"]').textContent =
@@ -343,6 +348,27 @@ export async function monter(racine, params, entete) {
   champNotes.addEventListener('blur', surNotes);
 
   peindre();
+}
+
+/** Bande des 7 jours de la semaine (lundi → dimanche) : séance faite, repos, prévue, aujourd'hui. */
+function semaineEnBref(date, checkins, journal, seances, plan) {
+  const lundi = decalerJour(date, -((depuisCle(date).getDay() + 6) % 7));
+  const parDate = new Map(checkins.map((c) => [c.date, c]));
+  const faits = new Set(journal.filter((j) => j.fin).map((j) => j.date));
+  checkins.forEach((c) => { if (c.seance === 'faite') faits.add(c.date); });
+  const lettres = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+  const jours = lettres.map((lettre, i) => {
+    const cle = decalerJour(lundi, i);
+    let etat = '';
+    let libelle = 'rien de noté';
+    if (faits.has(cle)) { etat = 'fait'; libelle = 'séance faite'; } else if (parDate.get(cle)?.seance === 'repos') { etat = 'repos'; libelle = 'repos'; } else if (cle >= date && seanceDuJour(seances, plan, cle)) { etat = 'prevu'; libelle = 'séance prévue'; }
+    return `
+      <li class="semaine__jour ${etat ? `semaine__jour--${etat}` : ''} ${cle === date ? 'semaine__jour--aujourdhui' : ''}">
+        <span class="semaine__lettre" aria-hidden="true">${lettre}</span>
+        <span class="semaine__marque" role="img" aria-label="${NOMS_JOURS_LONGS[depuisCle(cle).getDay()]} : ${libelle}"></span>
+      </li>`;
+  }).join('');
+  return `<ol class="semaine" aria-label="Cette semaine">${jours}</ol>`;
 }
 
 /** Rappel discret de sauvegarde, seulement quand il y a de quoi sauvegarder. */

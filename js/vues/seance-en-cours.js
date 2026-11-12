@@ -18,6 +18,7 @@ import {
 import { checkinVide } from './checkin.js';
 import { alternatives } from '../alternatives.js';
 import { nouveauxRecords } from '../records.js';
+import { ICONES } from '../icones.js';
 
 // ---------- Signal de fin de repos ----------
 
@@ -88,10 +89,10 @@ export async function monter(racine, params, entete) {
       <div class="nombre">
         <span class="nombre__libelle">${libelle}</span>
         <div class="nombre__ligne">
-          <button type="button" class="compteur__bouton" data-action="pas" data-champ="${champ}" data-pas="-1" aria-label="Diminuer ${libelle.toLowerCase()}">−</button>
+          <button type="button" class="compteur__bouton" data-action="pas" data-champ="${champ}" data-pas="-1" aria-label="Diminuer ${libelle.toLowerCase()}">${ICONES.moins}</button>
           <input class="nombre__champ" data-champ="${champ}" inputmode="${decimal ? 'decimal' : 'numeric'}" value="${echapper(decimal ? formatCharge(valeur) : valeur)}"
                  placeholder="—" autocomplete="off" aria-label="${libelle}">
-          <button type="button" class="compteur__bouton" data-action="pas" data-champ="${champ}" data-pas="1" aria-label="Augmenter ${libelle.toLowerCase()}">+</button>
+          <button type="button" class="compteur__bouton" data-action="pas" data-champ="${champ}" data-pas="1" aria-label="Augmenter ${libelle.toLowerCase()}">${ICONES.plus}</button>
         </div>
       </div>`;
   }
@@ -185,15 +186,15 @@ export async function monter(racine, params, entete) {
       </section>
 
       <section class="carte exo">
-        <p class="exo__position">Exercice ${i + 1} sur ${seance.exercices.length}</p>
         <h2 class="exo__nom">${echapper(ex.nom)}</h2>
+        <p class="meta">Exercice ${i + 1} sur ${seance.exercices.length}</p>
         ${ex.remplace ? `<p class="carte__note">Remplace : ${echapper(ex.remplace)}</p>` : ''}
         ${ex.consigne ? `<p class="exo__consigne">${echapper(ex.consigne)}</p>` : ''}
         ${serie ? `
           <p class="exo__serie">Série ${n + 1} sur ${ex.series.length}</p>
           ${ex.progression && n === 0 && !ex.series.some((s) => s.fait)
             ? `<p class="exo__progression">Objectif atteint la dernière fois : + ${formatCharge(PAS_CHARGE)} kg proposés.</p>` : ''}
-          <p class="carte__note">${refDerniere
+          <p class="carte__note exo__prevu">${refDerniere
             ? `La dernière fois : ${echapper(formatSerie(refDerniere, ex.unite))}`
             : `Prévu : ${ex.cible.series} × ${ex.cible.reps ?? '—'}${ex.unite && ex.unite !== 'reps' ? ` ${unite(ex.unite).court}` : ''}${ex.cible.charge !== null && ex.cible.charge !== undefined ? ` à ${formatCharge(ex.cible.charge)} kg` : ''}`}</p>
           ${faites ? `<div class="pilules">${faites}</div>` : ''}
@@ -209,7 +210,7 @@ export async function monter(racine, params, entete) {
         `}
         ${remplacement && remplacement.index === i ? panneauRemplacement(ex) : `
         <div class="exo__liens">
-          <button type="button" class="lien" data-action="ajouter-serie">+ Série</button>
+          <button type="button" class="lien lien--icone" data-action="ajouter-serie">${ICONES.plus}Série</button>
           ${ex.series.some((s) => s.fait) ? '' : '<button type="button" class="lien" data-action="remplacer-ouvrir">Remplacer</button>'}
           <a class="lien" href="#/seances/exercice/${ex.exerciceId}">Historique</a>
         </div>`}
@@ -222,8 +223,8 @@ export async function monter(racine, params, entete) {
             const nbFaites = e.series.filter((s) => s.fait).length;
             return `
               <li>
-                <button type="button" class="etat__ligne etat__ligne--bouton ${k === i ? 'etat__ligne--courant' : ''}" data-action="aller" data-index="${k}" ${k === i ? 'aria-current="true"' : ''}>
-                  <span class="pastille ${nbFaites === e.series.length ? 'pastille--ok' : nbFaites ? 'pastille--attente' : ''}" aria-hidden="true"></span>
+                <button type="button" class="etat__ligne etat__ligne--bouton ${k === i ? 'etat__ligne--courant' : ''} ${nbFaites === e.series.length ? 'etat__ligne--fait' : ''}" data-action="aller" data-index="${k}" ${k === i ? 'aria-current="true"' : ''}>
+                  <span class="pastille ${nbFaites === e.series.length ? 'pastille--ok' : nbFaites ? 'pastille--encours' : ''}" aria-hidden="true"></span>
                   <span class="etat__libelle">${echapper(e.nom)}</span>
                   <span class="etat__valeur">${nbFaites}/${e.series.length}</span>
                 </button>

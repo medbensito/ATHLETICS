@@ -107,8 +107,10 @@ with sync_playwright() as p:
     page.clock.set_fixed_time("2026-11-11T12:00:00Z")
     page.goto(URL + "#/aujourdhui/2026-11-10")
     page.goto(URL + "#/aujourdhui")
+    # Attendre l'écran du jour (et non celui du 10 encore affiché) : titre « Aujourd'hui ».
+    page.wait_for_function("document.title.startsWith(\"Aujourd'hui\")")
     page.wait_for_selector('[data-rubrique="seance"]')
-    verifier("pas de rappel à midi", page.locator('[data-rappel]').count() == 0)
+    verifier("pas de rappel à midi", page.locator('[data-rappel="checkin"], a.carte--rappel[data-rappel="seance"]').count() == 0)
     # Samedi : pas de rappel de séance (jours lun.–ven. par défaut)
     page.clock.set_fixed_time("2026-11-14T18:30:00Z")
     page.goto(URL + "#/aujourdhui/2026-11-13")

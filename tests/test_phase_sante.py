@@ -92,6 +92,7 @@ with sync_playwright() as p:
     page.screenshot(path=CAPTURES + "phase-annonce.png")
     page.click('.annonce-phase')
     page.wait_for_selector('text=Progrès en salle')
+    page.wait_for_function("document.title.startsWith('Phase 1')")
     verifier("écran du bilan de phase", page.locator('#titre-ecran').text_content() == "Phase 1 · Fondations", page.locator('#titre-ecran').text_content())
     texte = page.locator('#contenu').inner_text()
     verifier("bilan : séances, corps, progrès, suite", "2 / 20" in texte.replace("\n", " ") and "78 → 76,6 kg" in texte and "+ 3,5 kg" in texte and "Construction" in texte, texte[:300].replace("\n", "|"))

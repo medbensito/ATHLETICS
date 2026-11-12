@@ -1,0 +1,3 @@
+# Fichiers produits par les tests
+tests/captures/
+__pycache__/

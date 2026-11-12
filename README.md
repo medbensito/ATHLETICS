@@ -43,6 +43,8 @@ ATHLETICS/
 │       ├── records.js    Écran « Records »
 │       └── reglages.js   Écran « Réglages » : rappels, sauvegarde, état de l'app
 ├── icons/                Icônes 180 (iOS), 192, 512 et 512 « maskable »
+├── tests/                Tests automatiques (lancer.py, une suite par fonction)
+├── .github/workflows/    Vérification automatique sur GitHub
 ├── README.md             Ce fichier
 ├── PROGRAMME.md          Le programme sur-mesure en entier
 └── NOTES-TECHNIQUES.md   Choix techniques et points à vérifier sur iPhone
@@ -181,6 +183,23 @@ Toujours utiliser l'app depuis l'icône. L'app installée et l'onglet Safari ont
 - Changer de téléphone : exporter sur l'ancien, installer l'app sur le nouveau, importer.
 - Rythme conseillé : un export par semaine, enregistré dans Fichiers / iCloud Drive.
 - Supprimer l'icône de l'écran d'accueil **supprime les données** de l'app : exporter avant.
+
+## Tests
+
+Huit suites de tests vérifient l'app dans un navigateur mobile simulé : check-in, séances, programme, séance du jour, suivi corporel, bilan, rappels, import, calendrier, records, suppression.
+
+**Sur GitHub (automatique)** : à chaque `git push`, GitHub lance tous les tests (`.github/workflows/tests.yml`). Le résultat apparaît dans l'onglet **Actions** du dépôt, et sous forme de coche verte ou de croix rouge à côté de chaque commit. En cas d'échec, les captures d'écran sont jointes au rapport.
+
+**En local** (facultatif) :
+
+```
+pip install playwright
+python -m playwright install chromium
+python tests/lancer.py            # toutes les suites
+python tests/lancer.py corps      # seulement les suites dont le nom contient « corps »
+```
+
+Les captures d'écran sont enregistrées dans `tests/captures/` (ignoré par Git).
 
 ## Mettre à jour l'app
 

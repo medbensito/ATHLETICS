@@ -12,10 +12,17 @@ import { ICONES } from '../icones.js';
 
 export async function monter(racine, params, entete) {
   entete({ titre: 'Records', surTitre: 'Meilleures charges et max estimé' });
-  const records = [...calculerRecords(await lireTout('journal')).values()]
+  const journal = await lireTout('journal');
+  const records = [...calculerRecords(journal).values()]
     .sort((a, b) => a.nom.localeCompare(b.nom, 'fr'));
 
-  const retour = '<a class="retour" href="#/seances">${ICONES.gauche}Retour au programme</a>';
+  // Identifiant d'exercice le plus récent pour chaque nom : ouvre sa fiche (courbe de progression).
+  const idParNom = new Map();
+  for (const j of [...journal].sort((a, b) => (a.debut < b.debut ? -1 : 1))) {
+    for (const e of j.exercices) idParNom.set(String(e.nom || '').trim().toLowerCase(), e.exerciceId);
+  }
+
+  const retour = `<a class="retour" href="#/seances">${ICONES.gauche}Retour au programme</a>`;
   if (!records.length) {
     racine.innerHTML = `
       ${retour}
@@ -31,11 +38,13 @@ export async function monter(racine, params, entete) {
     <section class="carte">
       <ul class="etat">
         ${records.map((r) => `
-          <li class="etat__ligne etat__ligne--libre record">
-            <span class="etat__libelle">${echapper(r.nom)}<br><small>Meilleure charge : ${echapper(formatCharge(r.meilleureCharge.charge))} kg × ${r.meilleureCharge.reps}, ${echapper(dateCourte(r.meilleureCharge.date).toLowerCase())}</small></span>
+          <li class="record">
+           <a class="etat__ligne etat__ligne--libre record__lien" href="#/seances/exercice/${encodeURIComponent(idParNom.get(r.nom.trim().toLowerCase()) || '')}">
+            <span class="etat__libelle"><span class="record__nom">${echapper(r.nom)}</span><br><small>Meilleure charge : ${echapper(formatCharge(r.meilleureCharge.charge))} kg × ${r.meilleureCharge.reps}, ${echapper(dateCourte(r.meilleureCharge.date).toLowerCase())}</small></span>
             <span class="record__max">${r.max ? `${echapper(formatCharge(Math.round(r.max.valeur * 2) / 2))} kg<small>max estimé</small>` : '—'}</span>
+           </a>
           </li>`).join('')}
       </ul>
     </section>
-    <p class="carte__note">Max estimé : charge théorique sur une seule répétition, calculée à partir de tes séries (formule d'Epley, jusqu'à 12 répétitions). C'est une estimation, pas un test à faire.</p>`;
+    <p class="carte__note">Max estimé : charge théorique sur une seule répétition, calculée à partir de tes séries (formule d'Epley, jusqu'à 12 répétitions). C'est une estimation, pas un test à faire. Touche un exercice pour voir sa courbe de progression.</p>`;
 }

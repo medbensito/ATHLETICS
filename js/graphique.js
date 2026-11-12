@@ -119,8 +119,9 @@ export function graphique({ points, debut, cible, aujourdhui, objectif, unite, l
 /**
  * Active la bulle au toucher / survol dans un conteneur .graph.
  * Le point le plus proche horizontalement est mis en avant.
+ * texteBulle (facultatif) : (cible) => HTML de la bulle, à la place de « valeur unité / date ».
  */
-export function activerSurvol(conteneur, cibles, unite) {
+export function activerSurvol(conteneur, cibles, unite, texteBulle = null) {
   if (!cibles.length) return;
   const svg = conteneur.querySelector('svg');
   const curseur = svg.querySelector('[data-role="curseur"]');
@@ -141,7 +142,9 @@ export function activerSurvol(conteneur, cibles, unite) {
     curseur.hidden = false;
     actif.hidden = false;
 
-    bulle.innerHTML = `<strong>${echapper(formatValeur(proche.valeur))} ${echapper(unite)}</strong><span>${echapper(dateCourte(proche.date))}</span>`;
+    bulle.innerHTML = texteBulle
+      ? texteBulle(proche)
+      : `<strong>${echapper(formatValeur(proche.valeur))} ${echapper(unite)}</strong><span>${echapper(dateCourte(proche.date))}</span>`;
     bulle.hidden = false;
     // Bulle centrée sur le point, sans sortir du cadre.
     const largeur = bulle.offsetWidth;
@@ -160,4 +163,99 @@ export function activerSurvol(conteneur, cibles, unite) {
   svg.addEventListener('pointerleave', (evt) => { if (evt.pointerType === 'mouse') cacher(); });
   // Sur iPhone, la bulle reste affichée après le toucher ; un toucher ailleurs la referme.
   document.addEventListener('pointerdown', (evt) => { if (!conteneur.contains(evt.target)) cacher(); });
+}
+
+// ---------- Progression d'un exercice ----------
+
+/** Graduations de dates : une par semaine sur une courte période, sinon une par mois. */
+function graduationsDates(x0, x1) {
+  const total = joursEntre(x0, x1);
+  const grad = [];
+  if (total <= 56) {
+    const pasJours = total <= 21 ? 7 : 14;
+    for (let j = 0; j <= total; j += pasJours) {
+      const d = depuisCle(x0);
+      d.setDate(d.getDate() + j);
+      const cle = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      grad.push({ cle, texte: `${d.getDate()} ${MOIS[d.getMonth()]}` });
+    }
+    return grad;
+  }
+  const d = depuisCle(x0);
+  d.setDate(1);
+  d.setMonth(d.getMonth() + 1);
+  while (true) {
+    const cle = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
+    if (cle > x1) break;
+    grad.push({ cle, texte: MOIS[d.getMonth()] });
+    d.setMonth(d.getMonth() + 1);
+  }
+  return grad.filter((_, i) => grad.length <= 8 || i % 2 === 0);
+}
+
+/**
+ * Courbe de progression d'un exercice, séance après séance.
+ * Une seule mesure, un seul axe ; la dernière valeur est écrite au bout de la courbe.
+ * Pas d'objectif ni de tendance : seulement ce qui a été fait.
+ *
+ * @param {object} o
+ * @param {{date:string, valeur:number, detail?:string}[]} o.points  au moins 2, triés par date
+ * @param {string} o.unite    « kg », « reps », « s »…
+ * @param {string} o.libelle  pour le lecteur d'écran : « Charge », « Max estimé »…
+ */
+export function graphiqueProgression({ points, unite, libelle }) {
+  const x0 = points[0].date;
+  const x1 = points[points.length - 1].date;
+  const totalJours = Math.max(1, joursEntre(x0, x1));
+  // Marge à droite pour l'étiquette de la dernière valeur.
+  const largeurTrace = LP - 16;
+  const x = (cle) => M.gauche + (joursEntre(x0, cle) / totalJours) * largeurTrace;
+
+  const valeurs = points.map((p) => p.valeur);
+  let bas = Math.min(...valeurs);
+  let haut = Math.max(...valeurs);
+  if (haut - bas < 2) { bas -= 1; haut += 1; }
+  let pas = pasRond(haut - bas);
+  if (unite === 'kg' && pas === 2) pas = 2.5; // graduations alignées sur les disques de 1,25 kg
+  bas = Math.max(0, Math.floor(bas / pas) * pas);
+  haut = Math.ceil(haut / pas) * pas;
+  // Un peu d'air au-dessus du maximum, pour l'étiquette de la dernière valeur.
+  if (Math.max(...valeurs) > haut - pas * 0.3) haut += pas;
+  const y = (v) => M.haut + (1 - (v - bas) / (haut - bas)) * HP;
+
+  const gradY = [];
+  for (let v = bas; v <= haut + pas / 2; v += pas) gradY.push(Math.round(v * 100) / 100);
+  const gradX = graduationsDates(x0, x1);
+
+  const ligne = points.map((p, i) => `${i ? 'L' : 'M'}${x(p.date).toFixed(1)},${y(p.valeur).toFixed(1)}`).join(' ');
+  const dernier = points[points.length - 1];
+  const xd = x(dernier.date);
+  const yd = y(dernier.valeur);
+  // Étiquette de la dernière valeur : du côté opposé à l'arrivée de la courbe
+  // (au-dessus si elle monte ou reste stable, en dessous si elle descend), dans le cadre.
+  const descend = points[points.length - 2].valeur > dernier.valeur;
+  let yEtiquette = descend ? yd + 20 : yd - 12;
+  if (yEtiquette < M.haut + 4) yEtiquette = yd + 20;
+  if (yEtiquette > H - M.bas - 4) yEtiquette = yd - 12;
+
+  const svg = `
+    <svg class="graph__svg" viewBox="0 0 ${L} ${H}" role="img" aria-label="${echapper(`${libelle} en ${unite}, ${points.length} séances du ${dateCourte(x0)} au ${dateCourte(x1)} : de ${formatValeur(points[0].valeur)} à ${formatValeur(dernier.valeur)}`)}">
+      <g class="graph__grille">
+        ${gradY.map((v) => `
+          <line x1="${M.gauche}" x2="${L - M.droite}" y1="${y(v)}" y2="${y(v)}"/>
+          <text class="graph__txt" x="${M.gauche - 6}" y="${y(v) + 4}" text-anchor="end">${formatValeur(v)}</text>`).join('')}
+        ${gradX.map((g) => `
+          <text class="graph__txt" x="${x(g.cle)}" y="${H - 8}" text-anchor="middle">${echapper(g.texte)}</text>`).join('')}
+      </g>
+      <path class="graph__ligne" d="${ligne}"/>
+      ${points.map((p) => `<circle class="graph__point" cx="${x(p.date)}" cy="${y(p.valeur)}" r="4"/>`).join('')}
+      <text class="graph__txt graph__txt--fort graph__txt--valeur" x="${L - M.droite}" y="${yEtiquette}" text-anchor="end">${formatValeur(dernier.valeur)} ${echapper(unite)}</text>
+
+      <line class="graph__curseur" data-role="curseur" x1="0" x2="0" y1="${M.haut}" y2="${H - M.bas}" hidden/>
+      <circle class="graph__point graph__point--actif" data-role="actif" r="6" hidden/>
+      <rect class="graph__zone" x="${M.gauche}" y="${M.haut}" width="${LP}" height="${HP}"/>
+    </svg>`;
+
+  const cibles = points.map((p) => ({ x: x(p.date), y: y(p.valeur), date: p.date, valeur: p.valeur, detail: p.detail || '' }));
+  return { svg, cibles };
 }

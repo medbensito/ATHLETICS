@@ -244,6 +244,12 @@ body[data-ecran="seances-en-cours"] .entete { position: static; box-shadow: none
 .etat__ligne--bouton { width: 100%; text-align: left; min-height: 52px; }
 li + li > .etat__ligne--bouton { border-top: 1px solid var(--trait); }
 li:first-child > .etat__ligne--bouton { border-top: 0; }
+/* Records : chaque ligne ouvre la fiche de l'exercice */
+li + li > .record__lien { border-top: 1px solid var(--trait); }
+li:first-child > .record__lien { border-top: 0; }
+.record__lien { color: inherit; text-decoration: none; }
+.record__lien:active { background: var(--plateau); }
+.record__nom { color: var(--bleu); font-weight: 600; }
 .etat__ligne--courant .etat__libelle { color: var(--bleu); font-weight: 700; }
 
 .pastille { width: 10px; height: 10px; border-radius: 50%; background: var(--trait); }
@@ -832,6 +838,7 @@ html:has(body[data-ecran="seances-en-cours"]) { scroll-padding-bottom: calc(var(
 .graph__grille line { stroke: var(--trait); stroke-width: 1; }
 .graph__txt { fill: var(--encre-douce); font-family: var(--police); font-size: 10.5px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .graph__txt--fort { fill: var(--encre); font-weight: 700; }
+.graph__txt--valeur { font-size: 12px; paint-order: stroke; stroke: var(--carte); stroke-width: 3px; }
 .graph__repere { stroke: var(--encre-douce); stroke-width: 1.25; stroke-dasharray: 4 4; }
 .graph__aujourdhui { stroke: var(--trait); stroke-width: 1.5; }
 .graph__tendance { stroke: var(--encre); stroke-width: 1.5; stroke-dasharray: 6 5; opacity: 0.7; }

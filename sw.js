@@ -14,7 +14,7 @@
  * et ne sont jamais touchées par ce fichier.
  */
 
-const VERSION = 'v2.1.0';
+const VERSION = 'v2.2.0';
 const CACHE = `athletics-${VERSION}`;
 
 // Chemins relatifs : l'app fonctionne aussi dans un sous-dossier (ex. GitHub Pages).
@@ -46,6 +46,7 @@ const FICHIERS = [
   './js/seance-du-jour.js',
   './js/alternatives.js',
   './js/records.js',
+  './js/progression.js',
   './js/vues/checkin.js',
   './js/vues/reglages.js',
   './js/vues/seances.js',

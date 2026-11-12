@@ -246,6 +246,24 @@ Document tenu à jour à chaque jalon : choix faits, et points à vérifier sur 
 - [ ] Pendant le repos, le chrono, la charge, les répétitions et « Série faite » tiennent sur un écran.
 - [ ] « Exporter maintenant » à l'accueil ouvre la feuille de partage ; « Enregistrer dans Fichiers » fait disparaître le rappel.
 
+## Choix techniques (2.2 — courbe de progression par exercice)
+
+| Sujet | Choix | Raison |
+|---|---|---|
+| Où | Fiche de l'exercice (« Historique » en séance ou dans l'éditeur, et chaque ligne de Records) | Là où l'on se demande « est-ce que je progresse ? ». |
+| Mesures | Charge la plus lourde de la séance, ou max estimé de la meilleure série (bascule) ; sans charge : meilleure série (répétitions ou durée) | Avec la progression double, la charge reste stable pendant que les répétitions montent : le max estimé le rend visible. |
+| Forme | Une courbe, un axe, une mesure à la fois ; dernière valeur écrite au bout | Lisible en un coup d'œil, pas de double axe. |
+| Axe des dates | Une graduation par semaine (ou deux) sur 8 semaines, puis une par mois | Garde des repères lisibles du début à la fin des 6 mois. |
+| Graduations en kg | Pas de 2,5 kg plutôt que 2 | Correspond aux charges réellement utilisées. |
+| Toucher | Bulle : valeur, date et séries du jour (« 22,5 kg × 10, 10, 9 ») | Le détail sans quitter le graphique. |
+| Peu de données | Courbe dès la 2ᵉ séance ; avant, un message | Un seul point ne dit rien d'une progression. |
+| Correctif | Bouton « Retour » de la fiche exercice et des records : l'icône s'affichait en texte brut | Erreur introduite par la refonte 2.0. |
+
+## Points à vérifier sur iPhone (2.2)
+
+- [ ] Toucher la courbe affiche la bulle ; toucher ailleurs la referme.
+- [ ] La bascule Charge / Max estimé répond au premier toucher.
+
 ## Récapitulatif : ce qui ne peut être vérifié que sur un vrai iPhone
 
 - Installation, plein écran, encoche et barre d'accueil (J1).

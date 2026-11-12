@@ -3,7 +3,7 @@
 Application web progressive (PWA) personnelle de suivi de transformation physique.
 Tout reste sur l'appareil : pas de serveur, pas de compte, pas de service tiers.
 
-**Version 2.1.0** — check-in quotidien et séance du jour, programme sur-mesure de 6 mois (Push / Pull / Legs / Upper / Lower) et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire et calendrier, records, rappels, sauvegarde et restauration JSON.
+**Version 2.2.0** — check-in quotidien et séance du jour, programme sur-mesure de 6 mois (Push / Pull / Legs / Upper / Lower) et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire et calendrier, records, rappels, sauvegarde et restauration JSON.
 
 App en ligne : <https://medbensito.github.io/ATHLETICS/> (dépôt `medbensito/ATHLETICS`, GitHub Pages sur la branche `main`).
 
@@ -30,6 +30,7 @@ ATHLETICS/
 │   ├── plan.js           Programme sur-mesure 6 mois : contenu et phases
 │   ├── seance-du-jour.js Séance prévue aujourd'hui, démarrage d'une séance
 │   ├── alternatives.js   Exercices de remplacement, par groupes de mouvements
+│   ├── progression.js    Mesures de la courbe de progression d'un exercice
 │   ├── records.js        Records, max estimé, nouveaux records d'une séance
 │   ├── plateforme.js     Détection iOS / app installée, état technique
 │   ├── ui.js             Morceaux d'interface partagés
@@ -226,3 +227,4 @@ Les mises à jour ne touchent jamais les données saisies.
 - [x] **1.4** — calendrier de régularité, records et max estimé
 - [x] **2.0** — refonte visuelle « tableau blanc de salle » : thème clair, polices Barlow embarquées, icônes dessinées, bande de la semaine à l'accueil
 - [x] **2.1** — chrono de repos compact (les champs restent visibles), sauvegarde en un geste depuis l'accueil
+- [x] **2.2** — courbe de progression par exercice (charge, max estimé ou durée), accès depuis les records

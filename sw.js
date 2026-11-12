@@ -14,7 +14,7 @@
  * et ne sont jamais touchées par ce fichier.
  */
 
-const VERSION = 'v3.0.0';
+const VERSION = 'v3.1.0';
 const CACHE = `athletics-${VERSION}`;
 
 // Chemins relatifs : l'app fonctionne aussi dans un sous-dossier (ex. GitHub Pages).
@@ -48,6 +48,8 @@ const FICHIERS = [
   './js/alternatives.js',
   './js/records.js',
   './js/progression.js',
+  './js/phase.js',
+  './js/vues/phase.js',
   './js/piste.js',
   './js/vues/fin-seance.js',
   './js/vues/checkin.js',

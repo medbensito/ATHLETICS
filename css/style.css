@@ -1051,3 +1051,7 @@ html:has(body[data-ecran="seances-en-cours"]) { scroll-padding-bottom: calc(var(
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0ms !important; animation-duration: 0ms !important; }
 }
+
+/* Étapes numérotées (mode d'emploi du raccourci Santé) */
+.etapes { margin: 0; padding-left: 22px; display: grid; gap: 6px; color: var(--encre-douce); line-height: 1.45; }
+.etapes li::marker { color: var(--braise-texte); font-weight: 700; }

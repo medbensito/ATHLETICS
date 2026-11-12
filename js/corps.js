@@ -93,3 +93,18 @@ export function formatEcart(v) {
 /** Jours depuis la dernière mesure (null si aucune). */
 export const joursDepuisMesure = (mesures) =>
   (mesures.length ? joursEntre(mesures[mesures.length - 1].date, cleJour()) : null);
+
+/**
+ * Lit une pesée dans un texte collé (raccourci iOS « Pesée Athletics », copié depuis Santé).
+ * Accepte « 72,4 », « 72.4 », « 72,4 kg », « Poids : 72.40 kg »… ; renvoie un nombre arrondi
+ * au dixième, ou null si aucun poids plausible (entre les bornes de MESURES.poids) n'est trouvé.
+ * Une valeur en livres (« lb ») est refusée : le raccourci doit demander l'unité kg.
+ */
+export function lirePeseeCollee(texte) {
+  if (typeof texte !== 'string' || /\b(lb|lbs|livres?)\b/i.test(texte)) return null;
+  const m = texte.match(/\d{1,3}(?:[.,]\d+)?/);
+  if (!m) return null;
+  const v = Number(m[0].replace(',', '.'));
+  if (!Number.isFinite(v) || v < MESURES.poids.min || v > MESURES.poids.max) return null;
+  return Math.round(v * 10) / 10;
+}

@@ -3,7 +3,7 @@
 Application web progressive (PWA) personnelle de suivi de transformation physique.
 Tout reste sur l'appareil : pas de serveur, pas de compte, pas de service tiers.
 
-**Version 3.0.0** (refonte « Projecteur ») — check-in quotidien et séance du jour, programme sur-mesure de 6 mois (Push / Pull / Legs / Upper / Lower) et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire et calendrier, records, rappels, sauvegarde et restauration JSON.
+**Version 3.1.0** — check-in quotidien et séance du jour, programme sur-mesure de 6 mois (Push / Pull / Legs / Upper / Lower) et mode séance, suivi du poids et du tour de taille sur 6 mois, bilan hebdomadaire et calendrier, records, rappels, sauvegarde et restauration JSON.
 
 App en ligne : <https://medbensito.github.io/ATHLETICS/> (dépôt `medbensito/ATHLETICS`, GitHub Pages sur la branche `main`).
 
@@ -178,6 +178,17 @@ L'app ne contient aucune donnée personnelle : les données restent dans le navi
 
 Toujours utiliser l'app depuis l'icône. L'app installée et l'onglet Safari ont des **données séparées** : ce qui est saisi dans l'un n'apparaît pas dans l'autre.
 
+## Pesée depuis Santé (raccourci iOS)
+
+Une app web ne peut pas lire Santé. Un raccourci iOS copie la dernière pesée, l'app la colle en un toucher :
+
+1. App **Raccourcis** › **+** › nommer le raccourci « Pesée Athletics ».
+2. Action **Rechercher des échantillons de santé** : type « Poids », trier par « Date de début », « Plus récent d'abord », limite 1.
+3. Action **Copier dans le presse-papiers** (facultatif : **Afficher une notification** « Pesée copiée »).
+4. À chaque pesée : lancer le raccourci (ou « Dis Siri, Pesée Athletics »), puis Athletics › **Corps** › **Coller la pesée de Santé** › « Coller ». Vérifier, puis enregistrer.
+
+Le poids doit être en kilogrammes dans Santé. Le même mode d'emploi est dans Réglages.
+
 ## Sauvegarde des données
 
 > Safari peut effacer les données d'un site **non installé** après 7 jours sans visite. Installer l'app sur l'écran d'accueil évite cette purge, mais une sauvegarde régulière reste la seule vraie sécurité (changement de téléphone, désinstallation, réinitialisation).
@@ -232,3 +243,4 @@ Les mises à jour ne touchent jamais les données saisies.
 - [x] **2.1** — chrono de repos compact (les champs restent visibles), sauvegarde en un geste depuis l'accueil
 - [x] **2.2** — courbe de progression par exercice (charge, max estimé ou durée), accès depuis les records
 - [x] **3.0** — refonte « Projecteur » : thème sombre, piste des 26 semaines, carte du soir, tuiles du check-in, anneau de repos, écran de fin de séance avec records
+- [x] **3.1** — bilans de fin de phase (régularité, corps, progrès en salle), annonce des semaines allégées, pesée collée depuis Santé via un raccourci iOS

@@ -118,6 +118,26 @@ export async function monter(racine, params, entete) {
         <p class="carte__note">Sert uniquement à calculer la part de repas équilibrés dans le bilan.</p>
       </section>
 
+      <details class="carte depliable">
+        <summary class="depliable__titre">Pesée depuis Santé</summary>
+        <p class="carte__texte">Une app web ne peut pas lire Santé directement. Un raccourci iOS copie ta dernière pesée ; l'app la colle ensuite en un toucher, sans rien taper.</p>
+        <p class="champ__libelle">Créer le raccourci (une seule fois)</p>
+        <ol class="etapes">
+          <li>Ouvre l'app Raccourcis, touche « + » et nomme le raccourci « Pesée Athletics ».</li>
+          <li>Ajoute l'action « Rechercher des échantillons de santé » : type « Poids », trier par « Date de début », ordre « Plus récent d'abord », limite : 1.</li>
+          <li>Ajoute l'action « Copier dans le presse-papiers ».</li>
+          <li>Facultatif : ajoute « Afficher une notification » avec le texte « Pesée copiée ».</li>
+          <li>Autorise l'accès à Santé quand iOS le demande.</li>
+        </ol>
+        <p class="champ__libelle">À chaque pesée</p>
+        <ol class="etapes">
+          <li>Lance le raccourci (ou dis « Dis Siri, Pesée Athletics »).</li>
+          <li>Ouvre Athletics › Corps › « Coller la pesée de Santé », puis touche « Coller » dans la bulle d'iOS.</li>
+          <li>Vérifie la valeur et la date, puis enregistre.</li>
+        </ol>
+        <p class="carte__note">Le poids doit être en kilogrammes dans Santé. Rien n'est enregistré sans ta validation.</p>
+      </details>
+
       ${carteInstallation()}
       ${carteEtat()}
       <p class="version">Athletics ${echapper(VERSION_APP)}</p>`;

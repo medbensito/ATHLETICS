@@ -9,7 +9,7 @@ import { echapper } from '../ui.js';
 import { lireNombre, laisserMessage, prendreMessage } from '../programme.js';
 import {
   MESURES, RAPPEL_JOURS, ajouterMois, DUREE_MOIS, lireMesures, lirePeriode, ecrirePeriode,
-  points, tendance, formatValeur, formatEcart, joursDepuisMesure,
+  points, tendance, formatValeur, formatEcart, joursDepuisMesure, lirePeseeCollee,
 } from '../corps.js';
 import { graphique, activerSurvol } from '../graphique.js';
 
@@ -60,8 +60,9 @@ export async function monter(racine, params, entete) {
           <input class="saisie" type="date" data-role="date" value="${dateSaisie}" max="${aujourdhui}">
         </label>
         <button type="button" class="bouton" data-action="enregistrer">${existante ? 'Mettre à jour' : 'Enregistrer'}</button>
+        <button type="button" class="bouton bouton--secondaire" data-action="coller-pesee">Coller la pesée de Santé</button>
         <p class="carte__note" data-role="message" role="status">${echapper(message)}</p>
-        <p class="carte__note">Conseil : toujours dans les mêmes conditions, par exemple le même jour de la semaine, le matin à jeun.</p>
+        <p class="carte__note">Conseil : toujours dans les mêmes conditions, par exemple le même jour de la semaine, le matin à jeun. Pesée dans Santé : lance le raccourci « Pesée Athletics », puis « Coller » ici (mode d'emploi dans Réglages).</p>
       </section>`;
 
     // ---------- Graphiques ----------
@@ -200,6 +201,25 @@ export async function monter(racine, params, entete) {
         laisserMessage('Mesure enregistrée.');
         location.hash = '#/corps';
       }
+      return;
+    }
+
+    // Pesée copiée par le raccourci iOS : lecture du presse-papiers (iOS demande de toucher « Coller »).
+    if (cible.dataset.action === 'coller-pesee') {
+      let texte = null;
+      try {
+        texte = await navigator.clipboard.readText();
+      } catch {
+        afficherMessage('Le collage n\'a pas été autorisé : touche « Coller » dans la bulle d\'iOS, ou saisis la valeur.');
+        return;
+      }
+      const poids = lirePeseeCollee(texte);
+      if (poids === null) {
+        afficherMessage('Aucune pesée dans le presse-papiers. Lance d\'abord le raccourci « Pesée Athletics » (Réglages › Pesée depuis Santé).');
+        return;
+      }
+      $('[data-mesure="poids"]').value = formatValeur(poids);
+      afficherMessage(`Pesée collée : ${formatValeur(poids)} kg. Vérifie la date, puis enregistre.`);
       return;
     }
 

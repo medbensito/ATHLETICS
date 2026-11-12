@@ -29,10 +29,11 @@ import { echapper, carteInstallation } from '../ui.js';
 import { joursDepuisExport, formatAnciennete, preparerExport, remettreExport } from '../sauvegarde.js';
 import { carteRappelMesure } from './corps.js';
 import { lireRappels, rappelCheckinActif, rappelSeanceActif } from '../rappels.js';
-import { lirePlan, estSemaineAllegee } from '../plan.js';
+import { lirePlan, estSemaineAllegee, phase as phaseNumero } from '../plan.js';
 import { seanceDuJour, joursConnus, demarrerSeance, NOMS_JOURS_LONGS } from '../seance-du-jour.js';
 import { ICONES } from '../icones.js';
 import { pisteTransformation } from '../piste.js';
+import { annoncePlan } from '../phase.js';
 
 const LIMITES = { repas: 10, cigarettes: 99 };
 
@@ -238,7 +239,20 @@ export async function monter(racine, params, entete) {
     // La semaine en un coup d'œil : chaque jour fait est coché en menthe.
     if (joursConnus(seances, plan) || journal.some((j) => j.fin)) cartes += semaineEnBref(date, tous, journal, seances, plan);
     // La piste des 26 semaines ouvre l'écran, au-dessus de la séance du soir.
-    cartes = pisteTransformation(plan, date) + cartes;
+    // Annonces du calendrier du plan : bilan d'une phase terminée, semaine allégée qui commence demain.
+    const annonce = annoncePlan(plan, date);
+    let carteAnnonce = '';
+    if (annonce && annonce.type === 'fin-phase') {
+      const p = phaseNumero(annonce.numero);
+      carteAnnonce = `
+        <a class="carte carte--lien carte--rangee annonce-phase" href="#/bilan/phase/${p.numero}">
+          <span><span class="etiquette">Phase ${p.numero} terminée</span><br><span class="carte__titre">${echapper(p.nom)} : le bilan</span><br><span class="carte__note">Régularité, corps et progrès en salle sur ${p.semaines[1] - p.semaines[0] + 1} semaines.</span></span>
+          <span class="carte__fleche">${ICONES.droite}</span>
+        </a>`;
+    } else if (annonce && annonce.type === 'allegee') {
+      carteAnnonce = `<p class="annonce annonce--douce" data-role="annonce-allegee">Demain commence la semaine ${annonce.semaine}, une semaine allégée : une série de moins par exercice, même charge. Le corps récupère, puis progresse.</p>`;
+    }
+    cartes = pisteTransformation(plan, date) + carteAnnonce + cartes;
     if (cartes) $('.jours').insertAdjacentHTML('beforebegin', cartes);
   }
 

@@ -7,6 +7,8 @@ import { cleJour, estCleJour, decalerJour, dateCourte, formatDuree } from '../da
 import { echapper } from '../ui.js';
 import { lundi, calculerBilan, messageSemaine, formatNombre } from '../bilan.js';
 import * as calendrier from './calendrier.js';
+import * as phaseVue from './phase.js';
+import { lirePlan, semaineDuPlan, phasePourSemaine, DUREE_SEMAINES } from '../plan.js';
 import { ICONES } from '../icones.js';
 
 /** Écart avec la semaine précédente, en texte neutre (sans couleur ni jugement). */
@@ -30,11 +32,16 @@ const barre = (part, libelle) => `
 
 export async function monter(racine, params, entete) {
   if (params[0] === 'mois') return calendrier.monter(racine, params.slice(1), entete);
+  if (params[0] === 'phase') return phaseVue.monter(racine, params.slice(1), entete);
   const actuelle = lundi(cleJour());
   const demande = estCleJour(params[0]) ? lundi(params[0]) : actuelle;
   const cle = demande > actuelle ? actuelle : demande;
 
   const { semaine: s, precedente: p, premiereDonnee } = await calculerBilan(cle);
+  // Bilan de la phase du programme sur-mesure (celle de la semaine affichée).
+  const plan = await lirePlan();
+  const semainePlan = plan && plan.debut && s.dimanche >= plan.debut ? Math.min(semaineDuPlan(plan, s.dimanche), DUREE_SEMAINES) : null;
+  const phaseAffichee = semainePlan ? phasePourSemaine(semainePlan) : null;
   const estActuelle = cle === actuelle;
   const premiereSemaine = premiereDonnee ? lundi(premiereDonnee) : actuelle;
 
@@ -61,6 +68,12 @@ export async function monter(racine, params, entete) {
       <span class="carte__titre">Calendrier du mois</span>
       <span class="carte__fleche">${ICONES.droite}</span>
     </a>
+
+    ${phaseAffichee ? `
+    <a class="carte carte--lien carte--rangee" href="#/bilan/phase/${phaseAffichee.numero}">
+      <span><span class="carte__titre">Bilan de phase</span><br><span class="carte__note">Phase ${phaseAffichee.numero} · ${echapper(phaseAffichee.nom)} · semaine ${semainePlan} sur ${DUREE_SEMAINES}</span></span>
+      <span class="carte__fleche">${ICONES.droite}</span>
+    </a>` : ''}
 
     <section class="carte message-semaine">
       <p class="message-semaine__texte">${echapper(messageSemaine(s, p))}</p>

@@ -148,6 +148,7 @@ with sync_playwright() as p:
     # --- Vendredi : jour de repos
     page.clock.set_fixed_time("2026-11-13T10:00:00Z")
     accueil(page)
+    page.wait_for_selector('.seance-jour')  # cartes insérées après les rubriques
     verifier("vendredi : jour de repos", "vendredi · jour de repos" in page.locator('.seance-jour').inner_text().lower())
 
     # --- Éditeur : changer le jour de Push → vendredi

@@ -288,6 +288,22 @@ Direction choisie sur le canevas de maquettes (option D), à partir de la piste 
 - [ ] Toucher une tuile du check-in amène à la bonne rubrique.
 - [ ] La nouvelle icône (fond sombre, trois barres) : il faut réinstaller l'app pour la voir — exporter ses données avant.
 
+## Choix techniques (3.1 — bilans de phase et pesée depuis Santé)
+
+| Sujet | Choix | Raison |
+|---|---|---|
+| Bilan de phase | Écran `#/bilan/phase/<n>` : régularité, corps (dernière mesure connue au début → dernière de la phase), progrès en salle (max estimé de la 1re séance de la phase → meilleur) et phase suivante | Donner des étapes aux 6 mois, uniquement avec des faits. |
+| Accès | Accueil (semaine qui suit la fin d'une phase), Bilan (lien vers la phase de la semaine affichée), Séances (avant de passer à la phase suivante) | Le bilan arrive au moment où il sert. |
+| Semaines allégées | Annonce la veille (semaines 8, 16, 24) | Éviter la surprise d'une série en moins. |
+| Calculs | Module pur `js/phase.js`, testé sans interface | Fiable et vérifiable. |
+| Santé | Raccourci iOS → presse-papiers → bouton « Coller la pesée de Santé » (`navigator.clipboard.readText`) | iOS ouvre les liens dans Safari, pas dans l'app installée (stockage séparé) : le presse-papiers est le seul pont fiable. Rien n'est enregistré sans validation ; les livres sont refusées. |
+
+## Points à vérifier sur iPhone (3.1)
+
+- [ ] Le raccourci « Pesée Athletics » copie la dernière pesée de Santé.
+- [ ] Dans Corps, « Coller la pesée de Santé » affiche la bulle « Coller » d'iOS, puis remplit le poids.
+- [ ] En semaine 5, l'accueil propose le bilan de la phase 1.
+
 ## Récapitulatif : ce qui ne peut être vérifié que sur un vrai iPhone
 
 - Installation, plein écran, encoche et barre d'accueil (J1).

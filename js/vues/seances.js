@@ -228,6 +228,7 @@ function cartePlan(plan) {
         <button type="button" class="bouton" data-action="plan-mettre-a-jour">Mettre à jour mes séances</button>` : ''}
       ${suivante ? `
         <p class="carte__texte">La phase ${suivante.numero} (${echapper(suivante.nom)}) commence cette semaine.</p>
+        <a class="lien" href="#/bilan/phase/${actuelle.numero}">Voir le bilan de la phase ${actuelle.numero}</a>
         <button type="button" class="bouton" data-action="phase-suivante" data-phase="${suivante.numero}">Passer à la phase ${suivante.numero}</button>` : ''}
       <details class="depliable">
         <summary class="depliable__titre depliable__titre--petit">Comment fonctionne le programme</summary>
